@@ -2,13 +2,14 @@ import os
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
+
 bot = commands.Bot(command_prefix='!')
 load_dotenv(dotenv_path="../code bot/config")
 
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Streaming(name='regarde la nasa',url='https://www.twitch.tv/nasa'))
+    await bot.change_presence(activity=discord.Streaming(name='regarde la nasa', url='https://www.twitch.tv/nasa'))
     print('Logged in as')
     print('{0.user}'.format(bot))
     print('------')
@@ -29,6 +30,16 @@ async def test(ctx):
 async def test(ctx):
     if ctx == 798950981609193532:
         await ctx.send('{0.author.mention} sa va le spam?'.format(ctx))
+
+
+@bot.command(name="create")
+async def create(ctx):
+    channel = await ctx.guild.create_text_channel('Loup-garrou')
+
+@bot.command(name="mp")
+async def download(message):
+    channel = message.channel
+    await message.author.send('👀')
 
 
 @bot.command(name="del")
@@ -66,5 +77,5 @@ async def leave(ctx):
     channel = ctx.message.author.voice.channel
     await ctx.guild.voice_client.disconnect()
 
-bot.run(os.getenv("TOKEN"))
 
+bot.run(os.getenv("TOKEN"))
