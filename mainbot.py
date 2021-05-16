@@ -59,9 +59,26 @@ async def setup(ctx):
             f"Les salons ont bien été créer merci de réagir a ce messsage pour participer nb Joueur/nb "
             f"max Joueur")
         await msg.add_reaction('👀')
+        await msg.add_reaction('✅')
 
     else:
         await ctx.send(f"Les salons de jeux ont deja ete creer")
+
+    # a debuger
+    def checkEmoji(reaction, user):
+        return ctx.message.author == user and msg.id == reaction.message.id and (
+                str(reaction.emoji) == "👀" or str(reaction.emoji) == "✅")
+
+    try:
+        i = 0
+        while i == 0:
+            reaction, user = await bot.wait_for("reaction_add", check=checkEmoji)
+            if reaction.emoji == "👀":
+                await channel.send("{0.author.mention} est inscrit".format(ctx))
+            if reaction.emoji == "✅":
+                i = 1
+    finally:
+        await channel.send("La partie va commencé.")
 
 
 @bot.command(name="desetup")
@@ -71,6 +88,7 @@ async def desetup(ctx):
     await channel.delete()
     channel = discord.utils.get(guild.text_channels, name='loupgarou')
     await channel.delete()
+
 
 # mp une personne :eyes:
 @bot.command(name="mp")
@@ -106,14 +124,14 @@ async def oui(ctx):
     await ctx.send(embed=embed)
 
 
-# test connection dans channel vocal marche pas
+# connection dans channel vocal
 @bot.command()
 async def join(ctx):
     channel = ctx.author.voice.channel
     await channel.connect()
 
 
-# test deconnection dans channel vocal marche pas
+# deconnection dans channel vocal
 @bot.command()
 async def leave(ctx):
     await ctx.voice_client.disconnect()
