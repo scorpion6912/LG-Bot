@@ -45,13 +45,15 @@ async def test(ctx):
 
 # creation d'un channel textuel
 @bot.command(name="setup")
-async def create(ctx):
+async def setup(ctx):
     guild = ctx.guild
     channel = discord.utils.get(guild.text_channels, name='loupgarou')
     if channel is None:
         channel = await guild.create_text_channel('loupgarou')
-        await channel.send(f"Les salons ont bien été créer merci de réagir a ce messsage pour participer nb Joueur/nb "
+        msg = await channel.send(f"Les salons ont bien été créer merci de réagir a ce messsage pour participer nb Joueur/nb "
                            f"max Joueur")
+        await msg.add_reaction('👀')
+
     else:
         await ctx.send(f"Les salons de jeux ont deja ete creer")
 
