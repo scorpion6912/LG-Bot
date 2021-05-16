@@ -51,7 +51,7 @@ async def setup(ctx):
     if channel_vocal is None:
         await guild.create_voice_channel('loupgarou_vocal')
     else:
-        await ctx.send(f"Les salons vocaux ont deja ete creer")
+        await ctx.send(f"Le vocal a été créer")
     channel = discord.utils.get(guild.text_channels, name='loupgarou')
     if channel is None:
         channel = await guild.create_text_channel('loupgarou')
@@ -63,6 +63,14 @@ async def setup(ctx):
     else:
         await ctx.send(f"Les salons de jeux ont deja ete creer")
 
+
+@bot.command(name="desetup")
+async def desetup(ctx):
+    guild = ctx.guild
+    channel = discord.utils.get(guild.channels, name='loupgarou_vocal')
+    await channel.delete()
+    channel = discord.utils.get(guild.text_channels, name='loupgarou')
+    await channel.delete()
 
 # mp une personne :eyes:
 @bot.command(name="mp")
