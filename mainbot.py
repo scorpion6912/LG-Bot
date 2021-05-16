@@ -36,16 +36,30 @@ async def test(ctx):
         await ctx.send('{0.author.mention} sa va le spam?'.format(ctx))
 
 
+#bot.command(name="setup_role")
+#async def newrole(ctx):
+ #   role = await ctx.guild.create_role(name="LoupGarou", mentionable=True)
+  #  await ctx.author.add_roles(role)
+   # await ctx.send(f"Successfully created and assigned {role.mention}!")
+
+
 # creation d'un channel textuel
-@bot.command(name="create")
+@bot.command(name="setup")
 async def create(ctx):
-    channel = await ctx.guild.create_text_channel('Loup-garrou')
+    guild = ctx.guild
+    channel = discord.utils.get(guild.text_channels, name='loupgarou')
+    if channel is None:
+        channel = await guild.create_text_channel('loupgarou')
+        await channel.send(f"Les salons ont bien été créer merci de réagir a ce messsage pour participer nb Joueur/nb "
+                           f"max Joueur")
+    else:
+        await ctx.send(f"Les salons de jeux ont deja ete creer")
+
 
 
 # mp une personne :eyes:
 @bot.command(name="mp")
 async def download(message):
-    channel = message.channel
     await message.author.send('👀')
 
 
