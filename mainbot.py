@@ -36,27 +36,32 @@ async def test(ctx):
         await ctx.send('{0.author.mention} sa va le spam?'.format(ctx))
 
 
-#bot.command(name="setup_role")
-#async def newrole(ctx):
- #   role = await ctx.guild.create_role(name="LoupGarou", mentionable=True)
-  #  await ctx.author.add_roles(role)
-   # await ctx.send(f"Successfully created and assigned {role.mention}!")
+# bot.command(name="setup_role")
+# async def newrole(ctx):
+#     role = await ctx.guild.create_role(name="LoupGarou", mentionable=True)
+#     await ctx.author.add_roles(role)
+#     await ctx.send(f"Successfully created and assigned {role.mention}!")
 
 
 # creation d'un channel textuel
 @bot.command(name="setup")
 async def setup(ctx):
     guild = ctx.guild
+    channel_vocal = discord.utils.get(guild.channels, name='loupgarou_vocal')
+    if channel_vocal is None:
+        await guild.create_voice_channel('loupgarou_vocal')
+    else:
+        await ctx.send(f"Les salons vocaux ont deja ete creer")
     channel = discord.utils.get(guild.text_channels, name='loupgarou')
     if channel is None:
         channel = await guild.create_text_channel('loupgarou')
-        msg = await channel.send(f"Les salons ont bien été créer merci de réagir a ce messsage pour participer nb Joueur/nb "
-                           f"max Joueur")
+        msg = await channel.send(
+            f"Les salons ont bien été créer merci de réagir a ce messsage pour participer nb Joueur/nb "
+            f"max Joueur")
         await msg.add_reaction('👀')
 
     else:
         await ctx.send(f"Les salons de jeux ont deja ete creer")
-
 
 
 # mp une personne :eyes:
@@ -96,15 +101,14 @@ async def oui(ctx):
 # test connection dans channel vocal marche pas
 @bot.command()
 async def join(ctx):
-    channel = ctx.message.author.voice.channel
-    voice = await channel.connect()
+    channel = ctx.author.voice.channel
+    await channel.connect()
 
 
 # test deconnection dans channel vocal marche pas
 @bot.command()
 async def leave(ctx):
-    channel = ctx.message.author.voice.channel
-    await ctx.guild.voice_client.disconnect()
+    await ctx.voice_client.disconnect()
 
 
 bot.run(os.getenv("TOKEN"))
