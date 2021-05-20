@@ -22,20 +22,6 @@ async def on_member_join(member):
     print(f"Un nouveau membre est arrivé : {member.display_name}")
 
 
-# spam juan (inutile)
-@bot.event
-async def test(ctx):
-    if ctx == 290139158952017920:
-        await ctx.send('sa va juan?'.format(ctx))
-
-
-# spam bot (inutile)
-@bot.event
-async def test(ctx):
-    if ctx == 798950981609193532:
-        await ctx.send('{0.author.mention} sa va le spam?'.format(ctx))
-
-
 # bot.command(name="setup_role")
 # async def newrole(ctx):
 #     role = await ctx.guild.create_role(name="LoupGarou", mentionable=True)
@@ -47,33 +33,33 @@ async def test(ctx):
 @bot.command(name="setup")
 async def setup(ctx):
     guild = ctx.guild
-    channel_vocal = discord.utils.get(guild.channels, name='loupgarou_vocal')
+    channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
     if channel_vocal is None:
-        await guild.create_voice_channel('loupgarou_vocal')
+        await guild.create_voice_channel('Village_vocal')
     else:
-        await ctx.send(f"Le vocal a été créer")
-    channel = discord.utils.get(guild.text_channels, name='loupgarou')
+        await ctx.send(f"Le vocal a daja été créer")
+    channel = discord.utils.get(guild.text_channels, name='village')
     if channel is None:
-        channel = await guild.create_text_channel('loupgarou')
+        channel = await guild.create_text_channel('village')
         msg = await channel.send(
-            f"Les salons ont bien été créer merci de réagir a ce messsage pour participer nb Joueur/nb "
-            f"max Joueur")
-        await msg.add_reaction('👀')
+            f"Les salons ont bien été créer merci de réagir avec : ➕ a ce messsage pour participer et ✅ pour lancer "
+            f"la partie")
+        await msg.add_reaction('➕')
         await msg.add_reaction('✅')
 
     else:
         await ctx.send(f"Les salons de jeux ont deja ete creer")
 
     # a debuger
-    def checkEmoji(reaction, user):
-        return ctx.message.author == user and msg.id == reaction.message.id and (
-                str(reaction.emoji) == "👀" or str(reaction.emoji) == "✅")
+    def checkEmoji(reaction1, user1):
+        return ctx.message.author == user1 and msg.id == reaction1.message.id and (
+                str(reaction1.emoji) == "➕" or str(reaction1.emoji) == "✅")
 
     try:
         i = 0
         while i == 0:
             reaction, user = await bot.wait_for("reaction_add", check=checkEmoji)
-            if reaction.emoji == "👀":
+            if reaction.emoji == "➕":
                 await channel.send("{0.author.mention} est inscrit".format(ctx))
             if reaction.emoji == "✅":
                 i = 1
@@ -84,10 +70,32 @@ async def setup(ctx):
 @bot.command(name="desetup")
 async def desetup(ctx):
     guild = ctx.guild
-    channel = discord.utils.get(guild.channels, name='loupgarou_vocal')
+    channel = discord.utils.get(guild.channels, name='Village_vocal')
     await channel.delete()
-    channel = discord.utils.get(guild.text_channels, name='loupgarou')
+    channel = discord.utils.get(guild.text_channels, name='village')
     await channel.delete()
+
+
+@bot.command(name="aled")
+async def aled(ctx):
+    msg = await ctx.channel.send("Bonjour {0.author} tu as besoin d'aide?".format(ctx))
+    await msg.add_reaction('✅')
+    await msg.add_reaction('❌')
+
+    def checkEmoji(reaction2, user2):
+        return ctx.message.author == user2 and msg.id == reaction2.message.id and (
+                str(reaction2.emoji) == "✅" or str(reaction2.emoji) == "❌")
+
+    try:
+
+        reaction, user = await bot.wait_for("reaction_add", check=checkEmoji)
+        if reaction.emoji == "✅":
+            await ctx.author.send("voici les commandes que tu peux utiliser".format(ctx))
+            await ctx.channel.send("va voir tes mp".format(ctx))
+        if reaction.emoji == "❌":
+            await ctx.channel.send("D'accord n'hésite pas à me redemander si tu as besoin".format(ctx))
+    finally:
+        return
 
 
 # mp une personne :eyes:
