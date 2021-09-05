@@ -83,15 +83,12 @@ async def on_reaction_add(reaction, ctx):
 @bot.event
 async def on_raw_reaction_remove(payload):
     guild = bot.get_guild(payload.guild_id)
-    member = bot.get_guild(payload.guild_id).fetch_member(payload.user_id)
+    member = await bot.get_guild(payload.guild_id).fetch_member(payload.user_id)
     channel = discord.utils.get(guild.text_channels,name='village')
     role = discord.utils.get(guild.roles, name='LoupGarou')
-    print("1")
-    pseudo = member.mention
-    await channel.send(f"{pseudo} est désinscrit".format(member))
-    print("2")
     await member.remove_roles(role)
-    print("3")
+    await channel.send(f"{member.mention} est désinscrit".format(member))
+
 
 
 @bot.command(name="desetup")
