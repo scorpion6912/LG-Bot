@@ -38,6 +38,10 @@ async def setup(ctx):
     channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
     if channel_vocal is None:
         await guild.create_voice_channel('Village_vocal')
+        channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
+        await channel_vocal.set_permissions(ctx.guild.default_role, read_messages=False,send_messages=False)
+        role = discord.utils.get(ctx.guild.roles, name="LoupGarou")
+        await channel_vocal.set_permissions(role, read_messages=True, send_messages=True)
     else:
         await ctx.send(f"Le vocal a daja été créer")
     channel = discord.utils.get(guild.text_channels, name='village')
