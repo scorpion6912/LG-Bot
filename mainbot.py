@@ -26,7 +26,7 @@ async def on_member_join(member):
 
 @bot.command(name="setup_role")
 async def newrole(ctx):
-    role = await ctx.guild.create_role(name="LoupGarou", mentionable=True)
+    role = await ctx.guild.create_role(name="LoupGarou", colour=0xFF0F00, mentionable=True)
     await ctx.author.add_roles(role)
     await ctx.send(f"Successfully created and assigned {role.mention}!")
 
@@ -80,19 +80,28 @@ async def on_reaction_add(reaction, ctx):
     if reaction.emoji == "➕":
         channel = discord.utils.get(ctx.guild.text_channels,name='village')
         role = discord.utils.get(ctx.guild.roles, name='LoupGarou')
-        await ctx.add_roles(role)
-        await channel.send("{0.mention} est inscrit".format(ctx))
+        msg = await channel.fetch_message(reaction.message.id)
+        if msg.content == (f"Les salons ont bien été créer merci de réagir avec : ➕ a ce messsage pour participer et ✅ pour lancer "
+        f"la partie"):
+            await ctx.add_roles(role)
+            await channel.send("{0.mention} est inscrit".format(ctx))
+        else:
+            print("autre channel add")
 
 
 @bot.event
 async def on_raw_reaction_remove(payload):
     guild = bot.get_guild(payload.guild_id)
     member = await bot.get_guild(payload.guild_id).fetch_member(payload.user_id)
-    channel = discord.utils.get(guild.text_channels,name='village')
+    channel = discord.utils.get(guild.text_channels, name='village')
     role = discord.utils.get(guild.roles, name='LoupGarou')
-    await member.remove_roles(role)
-    await channel.send(f"{member.mention} est désinscrit".format(member))
-
+    msg = await channel.fetch_message(payload.message_id)
+    if msg.content == (f"Les salons ont bien été créer merci de réagir avec : ➕ a ce messsage pour participer et ✅ pour lancer "
+    f"la partie"):
+        await member.remove_roles(role)
+        await channel.send(f"{member.mention} est désinscrit".format(member))
+    else:
+        print("autre channel remove")
 
 
 @bot.command(name="desetup")
