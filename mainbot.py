@@ -56,21 +56,6 @@ async def setup(ctx):
     else:
         await ctx.send(f"Les salons de jeux ont deja ete creer")
 
-    # a debuger
-    #def checkEmoji(reaction1, user1):
-     #   return ctx.message.author == user1 and msg.id == reaction1.message.id and (
-      #          str(reaction1.emoji) == "➕" or str(reaction1.emoji) == "✅")
-
- #   try:
-  #      i = 0
-   #     while i == 0:
-    #        reaction, user = await bot.wait_for("reaction_add", check=checkEmoji)
-     #       if reaction.emoji == "➕":
-     #           await channel.send("{0.author.mention} est inscrit".format(ctx))
-      #      if reaction.emoji == "✅":
-       #         i = 1
-   # finally:
-    #    await channel.send("La partie va commencé.")
 
 
 @bot.event
