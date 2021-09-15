@@ -57,7 +57,6 @@ async def setup(ctx):
         await ctx.send(f"Les salons de jeux ont deja ete creer")
 
 
-
 @bot.event
 async def on_reaction_add(reaction, ctx):
     if ctx.id == 834401250865840148:
