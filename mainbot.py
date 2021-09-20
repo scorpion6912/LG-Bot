@@ -26,7 +26,7 @@ async def on_member_join(member):
 
 @bot.command(name="setup_role")
 async def newrole(ctx):
-    role = await ctx.guild.create_role(name="LoupGarou", colour=0xFF0F00, mentionable=True)
+    role = await ctx.guild.create_role(name="Villageois", colour=0xFF0F00, mentionable=True)
     await ctx.author.add_roles(role)
     await ctx.send(f"Successfully created and assigned {role.mention}!")
 
@@ -40,7 +40,7 @@ async def setup(ctx):
         await guild.create_voice_channel('Village_vocal')
         channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
         await channel_vocal.set_permissions(ctx.guild.default_role, read_messages=False,send_messages=False)
-        role = discord.utils.get(ctx.guild.roles, name="LoupGarou")
+        role = discord.utils.get(ctx.guild.roles, name="Villageois")
         await channel_vocal.set_permissions(role, read_messages=True, send_messages=True)
     else:
         await ctx.send(f"Le vocal a daja été créer")
@@ -52,6 +52,10 @@ async def setup(ctx):
             f"la partie")
         await msg.add_reaction('➕')
         await msg.add_reaction('✅')
+    channel = discord.utils.get(guild.text_channels, name='loup-garou')
+    if channel is None:
+        channel = await guild.create_text_channel('loup-garou')
+        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
 
     else:
         await ctx.send(f"Les salons de jeux ont deja ete creer")
@@ -65,7 +69,7 @@ async def on_reaction_add(reaction, ctx):
     if reaction.message.channel.id != channel.id:
         return
     if reaction.emoji == "➕":
-        role = discord.utils.get(ctx.guild.roles, name='LoupGarou')
+        role = discord.utils.get(ctx.guild.roles, name='Villageois')
         msg = await channel.fetch_message(reaction.message.id)
         if msg.content == (f"Les salons ont bien été créer merci de réagir avec : ➕ a ce messsage pour participer et ✅ pour lancer "
         f"la partie"):
@@ -73,6 +77,10 @@ async def on_reaction_add(reaction, ctx):
             await channel.send("{0.mention} est inscrit".format(ctx))
         else:
             print("autre channel add")
+    if reaction.emoji == "✅":
+        msg = await channel.fetch_message(reaction.message.id)
+        await msg.delete()
+        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
 
 
 @bot.event
@@ -82,7 +90,7 @@ async def on_raw_reaction_remove(payload):
     channel = discord.utils.get(guild.text_channels, name='village')
     if payload.channel_id != channel.id:
         return
-    role = discord.utils.get(guild.roles, name='LoupGarou')
+    role = discord.utils.get(guild.roles, name='Villageois')
     msg = await channel.fetch_message(payload.message_id)
     if msg.content == (f"Les salons ont bien été créer merci de réagir avec : ➕ a ce messsage pour participer et ✅ pour lancer "
     f"la partie"):
@@ -98,6 +106,8 @@ async def desetup(ctx):
     channel = discord.utils.get(guild.channels, name='Village_vocal')
     await channel.delete()
     channel = discord.utils.get(guild.text_channels, name='village')
+    await channel.delete()
+    channel = discord.utils.get(guild.text_channels, name='loup-garou')
     await channel.delete()
 
 
