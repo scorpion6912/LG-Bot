@@ -61,8 +61,10 @@ async def setup(ctx):
 async def on_reaction_add(reaction, ctx):
     if ctx.id == 834401250865840148:
         return
+    channel = discord.utils.get(ctx.guild.text_channels, name='village')
+    if reaction.message.channel.id != channel.id:
+        return
     if reaction.emoji == "➕":
-        channel = discord.utils.get(ctx.guild.text_channels,name='village')
         role = discord.utils.get(ctx.guild.roles, name='LoupGarou')
         msg = await channel.fetch_message(reaction.message.id)
         if msg.content == (f"Les salons ont bien été créer merci de réagir avec : ➕ a ce messsage pour participer et ✅ pour lancer "
@@ -78,6 +80,8 @@ async def on_raw_reaction_remove(payload):
     guild = bot.get_guild(payload.guild_id)
     member = await bot.get_guild(payload.guild_id).fetch_member(payload.user_id)
     channel = discord.utils.get(guild.text_channels, name='village')
+    if payload.channel_id != channel.id:
+        return
     role = discord.utils.get(guild.roles, name='LoupGarou')
     msg = await channel.fetch_message(payload.message_id)
     if msg.content == (f"Les salons ont bien été créer merci de réagir avec : ➕ a ce messsage pour participer et ✅ pour lancer "
