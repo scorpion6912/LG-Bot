@@ -18,32 +18,24 @@ async def on_ready():
     print('------')
 
 
-# arriver membre (a tester)
-@bot.event
-async def on_member_join(member):
-    print(f"Un nouveau membre est arrivé : {member.display_name}")
-
-
-@bot.command(name="setup_role")
-async def newrole(ctx):
-    role = await ctx.guild.create_role(name="Villageois", colour=0xFF0F00, mentionable=True)
-    await ctx.author.add_roles(role)
-    await ctx.send(f"Successfully created and assigned {role.mention}!")
-
-
 # creation d'un channel textuel
 @bot.command(name="setup")
 async def setup(ctx):
+    role = discord.utils.get(ctx.guild.roles, name="Villageois")
+    if role is None:
+        await ctx.guild.create_role(name="Villageois", colour=0xFF0F00, mentionable=True)
+    else:
+        await ctx.send(f"Le rôle a deja été créer")
     guild = ctx.guild
     channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
     if channel_vocal is None:
         await guild.create_voice_channel('Village_vocal')
         channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
-        await channel_vocal.set_permissions(ctx.guild.default_role, read_messages=False,send_messages=False)
+        await channel_vocal.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
         role = discord.utils.get(ctx.guild.roles, name="Villageois")
         await channel_vocal.set_permissions(role, read_messages=True, send_messages=True)
     else:
-        await ctx.send(f"Le vocal a daja été créer")
+        await ctx.send(f"Le vocal a deja été créer")
     channel = discord.utils.get(guild.text_channels, name='village')
     if channel is None:
         channel = await guild.create_text_channel('village')
@@ -103,6 +95,8 @@ async def on_raw_reaction_remove(payload):
 @bot.command(name="desetup")
 async def desetup(ctx):
     guild = ctx.guild
+    role = discord.utils.get(ctx.guild.roles, name="Villageois")
+    await role.delete()
     channel = discord.utils.get(guild.channels, name='Village_vocal')
     await channel.delete()
     channel = discord.utils.get(guild.text_channels, name='village')
