@@ -55,7 +55,7 @@ async def setup(ctx):
 
 @bot.event
 async def on_reaction_add(reaction, ctx):
-    if ctx.id == 834401250865840148:
+    if ctx.id == bot.user:
         return
     channel = discord.utils.get(ctx.guild.text_channels, name='village')
     if reaction.message.channel.id != channel.id:
