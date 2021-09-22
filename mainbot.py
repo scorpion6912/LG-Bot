@@ -55,7 +55,7 @@ async def setup(ctx):
 
 @bot.event
 async def on_reaction_add(reaction, ctx):
-    if ctx.id == bot.user:
+    if ctx.id == bot.user.id:
         return
     channel = discord.utils.get(ctx.guild.text_channels, name='village')
     if reaction.message.channel.id != channel.id:
@@ -107,27 +107,11 @@ async def desetup(ctx):
 
 @bot.command(name="aled")
 async def aled(ctx):
-    msg = await ctx.channel.send("Bonjour {0.author} tu as besoin d'aide?".format(ctx))
-    await msg.add_reaction('✅')
-    await msg.add_reaction('❌')
-
-    def checkEmoji(reaction2, user2):
-        return ctx.message.author == user2 and msg.id == reaction2.message.id and (
-                str(reaction2.emoji) == "✅" or str(reaction2.emoji) == "❌")
-
-    try:
-
-        reaction, user = await bot.wait_for("reaction_add", check=checkEmoji)
-        if reaction.emoji == "✅":
-            await ctx.author.send("voici les commandes que tu peux utiliser".format(ctx))
-            await ctx.author.send("!setup permet de créer les channels ".format(ctx))
-            await ctx.author.send("!desetup permet de supprimer les channels créer par le bot".format(ctx))
-            await ctx.author.send("!aled pour avoir la liste des commandes".format(ctx))
-            await ctx.channel.send("va voir tes mp".format(ctx))
-        if reaction.emoji == "❌":
-            await ctx.channel.send("D'accord n'hésite pas à me redemander si tu as besoin".format(ctx))
-    finally:
-        return
+    await ctx.author.send("voici les commandes que tu peux utiliser".format(ctx))
+    await ctx.author.send("!setup permet de créer les channels ".format(ctx))
+    await ctx.author.send("!desetup permet de supprimer les channels créer par le bot".format(ctx))
+    await ctx.author.send("!aled pour avoir la liste des commandes".format(ctx))
+    await ctx.channel.send("va voir tes mp".format(ctx))
 
 
 # mp une personne :eyes:
