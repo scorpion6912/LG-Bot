@@ -4,6 +4,7 @@ from discord import guild
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
+from discord.ext import tasks
 
 bot = commands.Bot(command_prefix='!')
 load_dotenv(dotenv_path="../code bot/config")
@@ -169,5 +170,23 @@ async def join(ctx):
 async def leave(ctx):
     await ctx.voice_client.disconnect()
 
+
+def loop(ctx):
+    async def coro(l: tasks.Loop):
+        await ctx.send(f"Il vous reste {(l.seconds * (l.count + 1)) // (l.current_loop + 1)}s")
+    return coro
+
+
+def end_loop(ctx):
+    async def coro():
+        await ctx.send("Done !")
+    return coro
+
+
+@bot.command(name='time')
+async def startTime(ctx, time: int, count: int):
+    l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
+    l.after_loop(end_loop(ctx))
+    l.start(l)
 
 bot.run(os.getenv("TOKEN"))
