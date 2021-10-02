@@ -46,13 +46,32 @@ async def setup(ctx):
             f"la partie")
         await msg.add_reaction('➕')
         await msg.add_reaction('✅')
+    else:
+        await ctx.send(f"village est déjà créer")
     channel = discord.utils.get(guild.text_channels, name='loup-garou')
     if channel is None:
         channel = await guild.create_text_channel('loup-garou')
         await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
-
     else:
-        await ctx.send(f"Les salons de jeux ont deja ete creer")
+        await ctx.send(f"loup-garou est déjà créer")
+    channel = discord.utils.get(guild.text_channels, name='cupidon')
+    if channel is None:
+        channel = await guild.create_text_channel('cupidon')
+        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
+    else:
+        await ctx.send(f"cupidon est déjà créer")
+    channel = discord.utils.get(guild.text_channels, name='sorciere')
+    if channel is None:
+        channel = await guild.create_text_channel('sorciere')
+        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
+    else:
+        await ctx.send(f"sorciere est déjà créer")
+    channel = discord.utils.get(guild.text_channels, name='voyante')
+    if channel is None:
+        channel = await guild.create_text_channel('voyante')
+        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
+    else:
+        await ctx.send(f"voyante est déjà créer")
 
 
 # Création message après setup,à réagir pour savoir qui veut s'inscrire
@@ -124,6 +143,12 @@ async def desetup(ctx):
     channel = discord.utils.get(guild.text_channels, name='village')
     await channel.delete()
     channel = discord.utils.get(guild.text_channels, name='loup-garou')
+    await channel.delete()
+    channel = discord.utils.get(guild.text_channels, name='sorciere')
+    await channel.delete()
+    channel = discord.utils.get(guild.text_channels, name='voyante')
+    await channel.delete()
+    channel = discord.utils.get(guild.text_channels, name='cupidon')
     await channel.delete()
 
 
@@ -229,6 +254,12 @@ async def botdesetup(ctx):
     await channel.delete()
     channel = discord.utils.get(guild.text_channels, name='loup-garou')
     await channel.delete()
+    channel = discord.utils.get(guild.text_channels, name='sorciere')
+    await channel.delete()
+    channel = discord.utils.get(guild.text_channels, name='voyante')
+    await channel.delete()
+    channel = discord.utils.get(guild.text_channels, name='cupidon')
+    await channel.delete()
 
 
 async def botsetup(ctx):
@@ -256,13 +287,32 @@ async def botsetup(ctx):
             f"la partie")
         await msg.add_reaction('➕')
         await msg.add_reaction('✅')
+    else:
+        await ctx.send(f"village est déjà créer")
     channel = discord.utils.get(guild.text_channels, name='loup-garou')
     if channel is None:
         channel = await guild.create_text_channel('loup-garou')
         await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
-
     else:
-        await ctx.send(f"Les salons de jeux ont deja ete creer")
+        await ctx.send(f"loup-garou est déjà créer")
+    channel = discord.utils.get(guild.text_channels, name='cupidon')
+    if channel is None:
+        channel = await guild.create_text_channel('cupidon')
+        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
+    else:
+        await ctx.send(f"cupidon est déjà créer")
+    channel = discord.utils.get(guild.text_channels, name='sorciere')
+    if channel is None:
+        channel = await guild.create_text_channel('sorciere')
+        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
+    else:
+        await ctx.send(f"sorciere est déjà créer")
+    channel = discord.utils.get(guild.text_channels, name='voyante')
+    if channel is None:
+        channel = await guild.create_text_channel('voyante')
+        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
+    else:
+        await ctx.send(f"voyante est déjà créer")
 
 
 async def game(ctx):
@@ -289,7 +339,7 @@ async def game(ctx):
     await channel_village.send("Les Loups-Garous se réveillent, se reconnaissent et désignent une nouvelle victime !!!")
     await channel_lg.send("C'est le moment de voter")
     time.sleep(5)
-    await channel_village.send("les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
+    await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
 
 
 bot.run(os.getenv("TOKEN"))
