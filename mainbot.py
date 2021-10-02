@@ -68,7 +68,8 @@ async def on_reaction_add(reaction, ctx):
         role = discord.utils.get(ctx.guild.roles, name='Villageois')
         msg = await channel.fetch_message(reaction.message.id)
         if msg.content == (
-                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
+                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour "
+                f"lancer "
                 f"la partie"):
             await ctx.add_roles(role)
             await channel.send("{0.mention} est inscrit".format(ctx))
@@ -80,10 +81,11 @@ async def on_reaction_add(reaction, ctx):
         await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
         role = discord.utils.get(ctx.guild.roles, name='Villageois')
         await channel.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
-        if await count_villageois(ctx) < 4:
+        if await count_villageois(ctx) < 1:
             await liste_villageois(ctx)
             return
         await liste_villageois(ctx)
+        await game(ctx)
 
 
 # Se désinscrire
@@ -208,7 +210,7 @@ async def liste_villageois(ctx):
         else:
             text = text + ctx.name + " "
             i = i + 1
-    if i < 4:
+    if i < 1:
         await channel.send("impossible de lancer à moins de quatre".format(ctx))
         time.sleep(2)
         await botdesetup(ctx)
@@ -261,6 +263,33 @@ async def botsetup(ctx):
 
     else:
         await ctx.send(f"Les salons de jeux ont deja ete creer")
+
+
+async def game(ctx):
+    guild = ctx.guild
+    channel_village = discord.utils.get(guild.text_channels, name='village')
+    channel_lg = discord.utils.get(guild.text_channels, name='loup-garou')
+    await channel_village.send("Il fait sombre, la lumière de la lune traverse à peine les nuages pour révéler le "
+                               "village de "
+                               "Thiercelieux. Une petite bourgade sans prétention et paisible coincée dans les "
+                               "montagnes. Pourtant, "
+                               "une malédiction a frappé ce village si innocent, tous les 100 ans un éclair noir "
+                               "tombe sur la stèle "
+                               "de la place centrale du village. Les démons viennent s’emparer de l’âme des pauvres "
+                               "villageois et "
+                               "réveillent en certains la présence d’un être plein de malice et de poils, "
+                               "le loup-garou. Le village "
+                               "cherche à éradiquer la menace tandis que les loup-garous infiltrés au sein de ce "
+                               "dernier profite de "
+                               "la nuit pour dévorer les innocents. Aideriez-vous le village à survivre ou au "
+                               "contraire "
+                               "tenterez-vous de le précipiter dans la mort ?")
+    time.sleep(4)
+    await channel_village.send("C’est la nuit, tout le village s’endort, les joueurs ferment leurs micros")
+    await channel_village.send("Les Loups-Garous se réveillent, se reconnaissent et désignent une nouvelle victime !!!")
+    await channel_lg.send("C'est le moment de voter")
+    time.sleep(5)
+    await channel_village.send("les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
 
 
 bot.run(os.getenv("TOKEN"))
