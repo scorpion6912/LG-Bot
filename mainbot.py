@@ -173,19 +173,20 @@ async def leave(ctx):
 
 def loop(ctx):
     async def coro(l: tasks.Loop):
-        await ctx.send(f"Il vous reste {(l.seconds * (l.count + 1)) // (l.current_loop + 1)}s")
+        await ctx.send(f"Il vous reste {((l.seconds*l.count+2)-(l.current_loop*l.seconds))-1}s")
     return coro
 
 
 def end_loop(ctx):
     async def coro():
-        await ctx.send("Done !")
+        await ctx.send("Done ! Votre temps est écoulé !")
+        #ajouter ici les inscrutions pour faire des actions
     return coro
 
 
 @bot.command(name='time')
-async def startTime(ctx, time: int, count: int):
-    l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
+async def startTime(ctx, time: int):
+    l = tasks.Loop(loop(ctx), (time/5)+1, 0, 0, (time//5)+1, True, None)
     l.after_loop(end_loop(ctx))
     l.start(l)
 
