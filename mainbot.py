@@ -53,6 +53,7 @@ async def setup(ctx):
     else:
         await ctx.send(f"Les salons de jeux ont deja ete creer")
 
+
 # Création message après setup,à réagir pour savoir qui veut s'inscrire
 # S'inscrire
 @bot.event
@@ -65,8 +66,9 @@ async def on_reaction_add(reaction, ctx):
     if reaction.emoji == "➕":
         role = discord.utils.get(ctx.guild.roles, name='Villageois')
         msg = await channel.fetch_message(reaction.message.id)
-        if msg.content == (f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
-            f"la partie"):
+        if msg.content == (
+        f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
+        f"la partie"):
             await ctx.add_roles(role)
             await channel.send("{0.mention} est inscrit".format(ctx))
         else:
@@ -75,6 +77,8 @@ async def on_reaction_add(reaction, ctx):
         msg = await channel.fetch_message(reaction.message.id)
         await msg.delete()
         await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
+
+
 # Se désinscrire
 @bot.event
 async def on_raw_reaction_remove(payload):
@@ -85,14 +89,16 @@ async def on_raw_reaction_remove(payload):
         return
     role = discord.utils.get(guild.roles, name='Villageois')
     msg = await channel.fetch_message(payload.message_id)
-    if msg.content == (f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
-        f"la partie"):
+    if msg.content == (
+    f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
+    f"la partie"):
         await member.remove_roles(role)
         await channel.send(f"{member.mention} est désinscrit".format(member))
     else:
         print("autre channel remove")
 
-#Fonction de desetup
+
+# Fonction de desetup
 @bot.command(name="desetup")
 async def desetup(ctx):
     guild = ctx.guild
@@ -105,7 +111,8 @@ async def desetup(ctx):
     channel = discord.utils.get(guild.text_channels, name='loup-garou')
     await channel.delete()
 
-#Affichage des commandes
+
+# Affichage des commandes
 @bot.command(name="aled")
 async def aled(ctx):
     embed = discord.Embed(title="tu as demande de l'aide ?", description="regarde tes mps 😉", color=0xFF0000)
@@ -163,13 +170,11 @@ async def join(ctx):
 async def leave(ctx):
     await ctx.voice_client.disconnect()
 
-@bot.command(name="random")
-async def random(ctx):
-    variable = [
-        "pile", "face"
-    ]
-    choisi = random.choice(variable)
-    await ctx.author.send("test".format(ctx))
-    await ctx.send(f"{format(choisi)}")
+# Test random pour comprendre l'utilisation
+@bot.command(name="randomtest")
+async def randomtest(ctx):
+    variable = ["pile", "face"]
+    choice = random.choice(variable)
+    await ctx.channel.send(choice.format(ctx))
 
 bot.run(os.getenv("TOKEN"))
