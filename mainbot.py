@@ -1,4 +1,5 @@
 import os
+import random
 
 from discord import guild
 from dotenv import load_dotenv
@@ -107,7 +108,7 @@ async def desetup(ctx):
 #Affichage des commandes
 @bot.command(name="aled")
 async def aled(ctx):
-    embed = discord.Embed(title="foo", description="bar", color=0xFF0000)
+    embed = discord.Embed(title="tu as demande de l'aide ?", description="regarde tes mps 😉", color=0xFF0000)
     await ctx.send(embed=embed)
     await ctx.author.send("voici les commandes que tu peux utiliser".format(ctx))
     await ctx.author.send("!setup permet de créer les channels ".format(ctx))
@@ -162,5 +163,13 @@ async def join(ctx):
 async def leave(ctx):
     await ctx.voice_client.disconnect()
 
+@bot.command(name="random")
+async def random(ctx):
+    variable = [
+        "pile", "face"
+    ]
+    choisi = random.choice(variable)
+    await ctx.author.send("test".format(ctx))
+    await ctx.send(f"{format(choisi)}")
 
 bot.run(os.getenv("TOKEN"))
