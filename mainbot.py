@@ -115,7 +115,6 @@ async def aled(ctx):
     await ctx.author.send("!aled pour avoir la liste des commandes".format(ctx))
     await ctx.channel.send("va voir tes mp".format(ctx))
 
-
 # Message privé une personne
 @bot.command(name="mp")
 async def download(message):
@@ -161,6 +160,26 @@ async def join(ctx):
 @bot.command()
 async def leave(ctx):
     await ctx.voice_client.disconnect()
+
+# Embed pour que sa soit plus jolie
+async def oui(ctx):
+    embed = discord.Embed(title="foo", description="bar", color=0xFF0000)
+    await ctx.send(embed=embed)
+
+# Sondage
+async def sondage_village(ctx):
+    liste = await liste_id_villageois(ctx)
+    liste_emoji ={1: ':zero:', 2: ':two:', 3: ':three:', 4: ':four:', 5: ':five:',6: ':sixe:', 7: ':seven:',8: ':eight',9: ':nine:'}
+    i = 0
+    channel_village = discord.utils.get(guild.text_channels, name='village')
+    await embed(ctx)
+while i != lengt.liste:
+
+    await channel_village.send(liste[i].name,)
+    await message.add_reaction(liste_emoji[i])
+    i+=1
+
+
 
 
 bot.run(os.getenv("TOKEN"))
