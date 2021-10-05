@@ -175,6 +175,14 @@ async def leave(ctx):
 async def randomtest(ctx):
     variable = ["pile", "face"]
     choice = random.choice(variable)
-    await ctx.channel.send(choice.format(ctx))
+    await ctx.channel.send(choice)
+
+@bot.command(name="randomvrs")
+async def  randomvrs(ctx):
+    variablee =["Atlas","Flo", "Léo", "Claire","Rémy"]
+    random.shuffle(variablee)
+    await ctx.send(variablee.pop())
+    await ctx.send(variablee.pop())
+
 
 bot.run(os.getenv("TOKEN"))
