@@ -5,8 +5,10 @@ from discord import guild
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
+intents = discord.Intents.default()  # Allow the use of custom intents
+intents.members = True
 
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='!', case_insensitive=True, intents=intents)
 load_dotenv(dotenv_path="../code bot/config")
 
 
@@ -22,56 +24,7 @@ async def on_ready():
 # Création d'un salon textuel
 @bot.command(name="setup")
 async def setup(ctx):
-    role = discord.utils.get(ctx.guild.roles, name="Villageois")
-    if role is None:
-        await ctx.guild.create_role(name="Villageois", colour=0xFF0F00, mentionable=True)
-    else:
-        await ctx.send(f"Le rôle a déjà été créer")
-    guild = ctx.guild
-    channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
-    if channel_vocal is None:
-        await guild.create_voice_channel('Village_vocal')
-        channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
-        await channel_vocal.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False,
-                                            view_channel=False)
-        role = discord.utils.get(ctx.guild.roles, name="Villageois")
-        await channel_vocal.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
-    else:
-        await ctx.send(f"Le vocal a déjà été créer")
-    channel = discord.utils.get(guild.text_channels, name='village')
-    if channel is None:
-        channel = await guild.create_text_channel('village')
-        msg = await channel.send(
-            f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
-            f"la partie")
-        await msg.add_reaction('➕')
-        await msg.add_reaction('✅')
-    else:
-        await ctx.send(f"village est déjà créer")
-    channel = discord.utils.get(guild.text_channels, name='loup-garou')
-    if channel is None:
-        channel = await guild.create_text_channel('loup-garou')
-        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
-    else:
-        await ctx.send(f"loup-garou est déjà créer")
-    channel = discord.utils.get(guild.text_channels, name='cupidon')
-    if channel is None:
-        channel = await guild.create_text_channel('cupidon')
-        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
-    else:
-        await ctx.send(f"cupidon est déjà créer")
-    channel = discord.utils.get(guild.text_channels, name='sorciere')
-    if channel is None:
-        channel = await guild.create_text_channel('sorciere')
-        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
-    else:
-        await ctx.send(f"sorciere est déjà créer")
-    channel = discord.utils.get(guild.text_channels, name='voyante')
-    if channel is None:
-        channel = await guild.create_text_channel('voyante')
-        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
-    else:
-        await ctx.send(f"voyante est déjà créer")
+    await botsetup(ctx)
 
 
 # Création message après setup,à réagir pour savoir qui veut s'inscrire
@@ -100,8 +53,11 @@ async def on_reaction_add(reaction, ctx):
         await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
         role = discord.utils.get(ctx.guild.roles, name='Villageois')
         await channel.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
-        if await count_villageois(ctx) < 1:
-            await liste_villageois(ctx)
+        if await count_villageois(ctx) < 2:
+            await channel.send("impossible de lancer a moins de 4")
+            time.sleep(3)
+            await botdesetup(ctx)
+            await botsetup(ctx)
             return
         await liste_villageois(ctx)
         await game(ctx)
@@ -135,21 +91,7 @@ async def test(ctx):
 # Fonction de desetup
 @bot.command(name="desetup")
 async def desetup(ctx):
-    guild = ctx.guild
-    role = discord.utils.get(ctx.guild.roles, name="Villageois")
-    await role.delete()
-    channel = discord.utils.get(guild.channels, name='Village_vocal')
-    await channel.delete()
-    channel = discord.utils.get(guild.text_channels, name='village')
-    await channel.delete()
-    channel = discord.utils.get(guild.text_channels, name='loup-garou')
-    await channel.delete()
-    channel = discord.utils.get(guild.text_channels, name='sorciere')
-    await channel.delete()
-    channel = discord.utils.get(guild.text_channels, name='voyante')
-    await channel.delete()
-    channel = discord.utils.get(guild.text_channels, name='cupidon')
-    await channel.delete()
+    await botdesetup(ctx)
 
 
 # Affichage des commandes
@@ -215,33 +157,22 @@ async def leave(ctx):
 
 async def count_villageois(ctx):
     role = discord.utils.get(ctx.guild.roles, name='Villageois')
-    i = 0
-    for member in ctx.guild.members:
-        if role in member.roles:
-            print("what")
-        else:
-            i = i + 1
-    return i
+    print(len(role.members))
+    return len(role.members)
 
 
 async def liste_villageois(ctx):
     channel = discord.utils.get(ctx.guild.text_channels, name='village')
     role = discord.utils.get(ctx.guild.roles, name='Villageois')
-    text = ""
-    i = 0
-    for member in ctx.guild.members:
-        if role in member.roles:
-            print("what")
-        else:
-            text = text + ctx.name + " "
-            i = i + 1
-    if i < 1:
-        await channel.send("impossible de lancer à moins de quatre".format(ctx))
-        time.sleep(2)
-        await botdesetup(ctx)
-        await botsetup(ctx)
-        return
-    await channel.send(str(i) + " joueurs :" + text + "vont jouer".format(ctx))
+    name = ""
+    for member in role.members:
+        name = name + member.name +" "
+    await channel.send(str(len(role.members)) + " joueurs :" + name + "vont jouer".format(ctx))
+
+
+async def liste_id_villageois(ctx):
+    role = discord.utils.get(ctx.guild.roles, name='Villageois')
+    return role.members
 
 
 async def botdesetup(ctx):
@@ -319,6 +250,8 @@ async def game(ctx):
     guild = ctx.guild
     channel_village = discord.utils.get(guild.text_channels, name='village')
     channel_lg = discord.utils.get(guild.text_channels, name='loup-garou')
+    channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
+    role_villageois = discord.utils.get(ctx.guild.roles, name="Villageois")
     await channel_village.send("Il fait sombre, la lumière de la lune traverse à peine les nuages pour révéler le "
                                "village de "
                                "Thiercelieux. Une petite bourgade sans prétention et paisible coincée dans les "
@@ -335,11 +268,12 @@ async def game(ctx):
                                "contraire "
                                "tenterez-vous de le précipiter dans la mort ?")
     time.sleep(4)
+
     await channel_village.send("C’est la nuit, tout le village s’endort, les joueurs ferment leurs micros")
     await channel_village.send("Les Loups-Garous se réveillent, se reconnaissent et désignent une nouvelle victime !!!")
     await channel_lg.send("C'est le moment de voter")
     time.sleep(5)
     await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
-
+    await channel_village.send(await liste_id_villageois(ctx))
 
 bot.run(os.getenv("TOKEN"))
