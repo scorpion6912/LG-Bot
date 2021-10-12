@@ -12,6 +12,7 @@ bot = commands.Bot(command_prefix='!', case_insensitive=True, intents=intents)
 load_dotenv(dotenv_path="../code bot/config")
 
 
+# Bot event:
 # Login
 @bot.event
 async def on_ready():
@@ -19,12 +20,6 @@ async def on_ready():
     print('Logged in as')
     print('{0.user}'.format(bot))
     print('------')
-
-
-# Création d'un salon textuel
-@bot.command(name="setup")
-async def setup(ctx):
-    await botsetup(ctx)
 
 
 # Création message après setup,à réagir pour savoir qui veut s'inscrire
@@ -82,10 +77,17 @@ async def on_raw_reaction_remove(payload):
         print("autre channel remove")
 
 
+# Bot commande:
 @bot.command(name="test")
 async def test(ctx):
     channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
     await channel.set_permissions(ctx.author, read_messages=True, send_messages=True, view_channel=True)
+
+
+# Création d'un salon textuel
+@bot.command(name="setup")
+async def setup(ctx):
+    await botsetup(ctx)
 
 
 # Fonction de desetup
@@ -166,7 +168,7 @@ async def liste_villageois(ctx):
     role = discord.utils.get(ctx.guild.roles, name='Villageois')
     name = ""
     for member in role.members:
-        name = name + member.name +" "
+        name = name + member.name + " "
     await channel.send(str(len(role.members)) + " joueurs :" + name + "vont jouer".format(ctx))
 
 
@@ -190,6 +192,8 @@ async def botdesetup(ctx):
     channel = discord.utils.get(guild.text_channels, name='voyante')
     await channel.delete()
     channel = discord.utils.get(guild.text_channels, name='cupidon')
+    await channel.delete()
+    channel = discord.utils.get(guild.text_channels, name='cimetiere')
     await channel.delete()
 
 
@@ -226,6 +230,12 @@ async def botsetup(ctx):
         await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
     else:
         await ctx.send(f"loup-garou est déjà créer")
+    channel = discord.utils.get(guild.text_channels, name='cimetiere')
+    if channel is None:
+        channel = await guild.create_text_channel('cimetiere')
+        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
+    else:
+        await ctx.send(f"cimetiere est déjà créer")
     channel = discord.utils.get(guild.text_channels, name='cupidon')
     if channel is None:
         channel = await guild.create_text_channel('cupidon')
