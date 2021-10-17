@@ -5,6 +5,7 @@ from discord import guild
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
+from discord.utils import get
 
 bot = commands.Bot(command_prefix='!')
 load_dotenv(dotenv_path="../code bot/config")
@@ -121,7 +122,7 @@ async def aled(ctx):
     await ctx.author.send("!setup permet de créer les channels ".format(ctx))
     await ctx.author.send("!desetup permet de supprimer les channels créer par le bot".format(ctx))
     await ctx.author.send("!aled pour avoir la liste des commandes".format(ctx))
-    await ctx.channel.send("va voir tes mp".format(ctx))
+
 
 
 # Message privé une personne
@@ -173,8 +174,12 @@ async def leave(ctx):
 # Test random pour comprendre l'utilisation
 @bot.command(name="randomtest")
 async def randomtest(ctx):
-    variable = ["pile", "face"]
+    variable = [290139158952017920,320209659313258496,327124675635183616, 809176293622808596]
     choice = random.choice(variable)
     await ctx.channel.send(choice.format(ctx))
-
+    user = get(bot.get_all_members(), id=choice)
+    if user:
+        await ctx.channel.send("l'ulisateur est : " + user.id(user).format(ctx))
+    else:
+        await  ctx.channel.send("Utilisateur non trouvé")
 bot.run(os.getenv("TOKEN"))
