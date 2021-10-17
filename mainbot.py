@@ -174,9 +174,24 @@ async def leave(ctx):
 # Test random pour comprendre l'utilisation
 @bot.command(name="randomtest")
 async def randomtest(ctx):
-    variable = [290139158952017920,320209659313258496,327124675635183616, 809176293622808596]
+    variable = ["pile", "face"]
+    choice = random.choice(variable)
+    await ctx.channel.send(choice)
+
+@bot.command(name="randomvrs")
+async def  randomvrs(ctx):
+    variablee =["Atlas","Flo", "Léo", "Claire","Rémy"]
+    random.shuffle(variablee)
+    await ctx.send(variablee.pop())
+    await ctx.send(variablee.pop())
+
+@bot.command(name="randomUtilis")
+async def randomUtilis(ctx):
+    variable = [290139158952017920, 320209659313258496, 327124675635183616, 809176293622808596]
     choice = random.choice(variable)
     await ctx.channel.send(choice.format(ctx))
+    variable = [290139158952017920, 320209659313258496, 327124675635183616, 809176293622808596]
+    choice = random.choice(variable)
     user = get(bot.get_all_members(), id=choice)
     if user:
         await ctx.channel.send("l'ulisateur est : " + user.id(user).format(ctx))
