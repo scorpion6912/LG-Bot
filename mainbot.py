@@ -5,7 +5,7 @@ from discord import guild
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
-intents = discord.Intents.default()  # Allow the use of custom intents
+intents = discord.Intents.default()
 intents.members = True
 
 bot = commands.Bot(command_prefix='!', case_insensitive=True, intents=intents)
@@ -33,12 +33,14 @@ async def on_reaction_add(reaction, ctx):
         return
     if reaction.emoji == "➕":
         role = discord.utils.get(ctx.guild.roles, name='Villageois')
+        role2 = discord.utils.get(ctx.guild.roles, name='Participant')
         msg = await channel.fetch_message(reaction.message.id)
         if msg.content == (
                 f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour "
                 f"lancer "
                 f"la partie"):
             await ctx.add_roles(role)
+            await ctx.add_roles(role2)
             await channel.send("{0.mention} est inscrit".format(ctx))
         else:
             print("autre channel add")
@@ -156,11 +158,15 @@ async def leave(ctx):
 
 
 # A partir d'ici se sont les fonctions appeler par le bot
-
 async def count_villageois(ctx):
     role = discord.utils.get(ctx.guild.roles, name='Villageois')
     print(len(role.members))
     return len(role.members)
+
+
+async def liste_id_participant(ctx):
+    role = discord.utils.get(ctx.guild.roles, name='Participant')
+    return role.members
 
 
 async def liste_villageois(ctx):
@@ -181,6 +187,10 @@ async def botdesetup(ctx):
     guild = ctx.guild
     role = discord.utils.get(ctx.guild.roles, name="Villageois")
     await role.delete()
+    role = discord.utils.get(ctx.guild.roles, name="Participant")
+    await role.delete()
+    role = discord.utils.get(ctx.guild.roles, name="Mort")
+    await role.delete()
     channel = discord.utils.get(guild.channels, name='Village_vocal')
     await channel.delete()
     channel = discord.utils.get(guild.text_channels, name='village')
@@ -198,9 +208,19 @@ async def botdesetup(ctx):
 
 
 async def botsetup(ctx):
+    role = discord.utils.get(ctx.guild.roles, name="Mort")
+    if role is None:
+        await ctx.guild.create_role(name="Mort", colour=0xFF0F00, mentionable=True)
+    else:
+        await ctx.send(f"Le rôle a déjà été créer")
     role = discord.utils.get(ctx.guild.roles, name="Villageois")
     if role is None:
         await ctx.guild.create_role(name="Villageois", colour=0xFF0F00, mentionable=True)
+    else:
+        await ctx.send(f"Le rôle a déjà été créer")
+    role = discord.utils.get(ctx.guild.roles, name="Participant")
+    if role is None:
+        await ctx.guild.create_role(name="Participant", mentionable=True)
     else:
         await ctx.send(f"Le rôle a déjà été créer")
     guild = ctx.guild
@@ -220,6 +240,10 @@ async def botsetup(ctx):
         msg = await channel.send(
             f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
             f"la partie")
+        role = discord.utils.get(ctx.guild.roles, name="Participant")
+        await channel.set_permissions(role, read_messages=True, send_messages=False, view_channel=True)
+        role = discord.utils.get(ctx.guild.roles, name="Villageois")
+        await channel.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
         await msg.add_reaction('➕')
         await msg.add_reaction('✅')
     else:
@@ -234,6 +258,8 @@ async def botsetup(ctx):
     if channel is None:
         channel = await guild.create_text_channel('cimetiere')
         await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
+        role = discord.utils.get(ctx.guild.roles, name="Mort")
+        await channel.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
     else:
         await ctx.send(f"cimetiere est déjà créer")
     channel = discord.utils.get(guild.text_channels, name='cupidon')
