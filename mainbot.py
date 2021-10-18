@@ -5,6 +5,7 @@ from discord import guild
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
+from discord.ext import tasks
 intents = discord.Intents.default()
 intents.members = True
 
@@ -157,7 +158,26 @@ async def leave(ctx):
     await ctx.voice_client.disconnect()
 
 
+@bot.command(name='time')
+async def startTime(ctx, time: int, count: int):
+    l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
+    l.after_loop(end_loop(ctx))
+    l.start(l)
+
 # A partir d'ici se sont les fonctions appeler par le bot
+def loop(ctx):
+    async def coro(l: tasks.Loop):
+        await ctx.send(f"Il vous reste {((l.seconds*l.count)-(l.current_loop*l.seconds))}s")
+    return coro
+
+
+def end_loop(ctx):
+    async def coro():
+        await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique !")
+        #ajouter ici les inscrutions pour faire des actions
+    return coro
+
+    
 async def count_villageois(ctx):
     role = discord.utils.get(ctx.guild.roles, name='Villageois')
     print(len(role.members))
@@ -311,5 +331,6 @@ async def game(ctx):
     time.sleep(5)
     await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
     await channel_village.send(await liste_id_villageois(ctx))
+
 
 bot.run(os.getenv("TOKEN"))
