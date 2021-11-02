@@ -194,7 +194,6 @@ async def liste_id_participant(ctx):
 async def randomUtilis(ctx):
     variable = await liste_id_participant(ctx)
     choice = random.choice(variable)
-    await ctx.channel.send(choice.id)
     user = bot.get_user(choice.id)
     return user
 
@@ -213,8 +212,8 @@ async def assigner_membre(ctx):
 
 @bot.command(name="assigner_membre_rdm")
 async def assigner_membre_rdm(ctx):
-    user = randomUtilis()
+    user = await randomUtilis(ctx)
     channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
-    await channel.set_permissions(ctx.author, read_messages=True, send_messages=True, view_channel=True)
+    await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
 
 bot.run(os.getenv("TOKEN"))
