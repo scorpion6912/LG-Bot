@@ -216,3 +216,5 @@ async def assigner_membre_rdm(ctx):
     user = randomUtilis()
     channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
     await channel.set_permissions(ctx.author, read_messages=True, send_messages=True, view_channel=True)
+
+bot.run(os.getenv("TOKEN"))
