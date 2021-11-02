@@ -196,6 +196,11 @@ async def randomUtilis(ctx):
     choice = random.choice(variable)
     await ctx.channel.send(choice.id)
     user = bot.get_user(choice.id)
+    return user
+
+@bot.command(name="testUser")
+async def testUser(ctx):
+    user = randomUtilis()
     if user:
         await ctx.channel.send("l'ulisateur est : " + user.name.format(ctx))
     else:
@@ -203,5 +208,11 @@ async def randomUtilis(ctx):
 
 @bot.command(name="assigner_membre")
 async def assigner_membre(ctx):
+    channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
+    await channel.set_permissions(ctx.author, read_messages=True, send_messages=True, view_channel=True)
+
+@bot.command(name="assigner_membre_rdm")
+async def assigner_membre_rdm(ctx):
+    user = randomUtilis()
     channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
     await channel.set_permissions(ctx.author, read_messages=True, send_messages=True, view_channel=True)
