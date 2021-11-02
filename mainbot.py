@@ -178,6 +178,7 @@ async def randomtest(ctx):
     choice = random.choice(variable)
     await ctx.channel.send(choice)
 
+
 @bot.command(name="randomvrs")
 async def  randomvrs(ctx):
     variablee =["Atlas","Flo", "Léo", "Claire","Rémy"]
@@ -185,14 +186,17 @@ async def  randomvrs(ctx):
     await ctx.send(variablee.pop())
     await ctx.send(variablee.pop())
 
+async def liste_id_participant(ctx):
+    role = discord.utils.get(ctx.guild.roles, name='Participant')
+    return role.members
+
 @bot.command(name="randomUtilis")
 async def randomUtilis(ctx):
-    variable = [290139158952017920, 320209659313258496, 327124675635183616, 809176293622808596]
+    variable = await liste_id_participant(ctx)
     choice = random.choice(variable)
-    await ctx.channel.send(choice.format(ctx))
-    user = get(bot.get_all_members(), id=choice)
+    await ctx.channel.send(choice.id)
+    user = bot.get_user(choice.id)
     if user:
-        await ctx.channel.send("l'ulisateur est : " + user.id(user).format(ctx))
+        await ctx.channel.send("l'ulisateur est : " + user.name.format(ctx))
     else:
-        await  ctx.channel.send("Utilisateur non trouvé")
-bot.run(os.getenv("TOKEN"))
+        await ctx.channel.send("Utilisateur non trouvé")
