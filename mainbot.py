@@ -7,7 +7,10 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 
-bot = commands.Bot(command_prefix='!')
+intents = discord.Intents.default()
+intents.members = True
+
+bot = commands.Bot(command_prefix='!', case_insensitive=True, intents=intents)
 load_dotenv(dotenv_path="../code bot/config")
 
 
@@ -171,6 +174,7 @@ async def join(ctx):
 async def leave(ctx):
     await ctx.voice_client.disconnect()
 
+
 # Test random pour comprendre l'utilisation
 @bot.command(name="randomtest")
 async def randomtest(ctx):
@@ -186,9 +190,11 @@ async def  randomvrs(ctx):
     await ctx.send(variablee.pop())
     await ctx.send(variablee.pop())
 
+
 async def liste_id_participant(ctx):
     role = discord.utils.get(ctx.guild.roles, name='Participant')
     return role.members
+
 
 @bot.command(name="randomUtilis")
 async def randomUtilis(ctx):
@@ -196,6 +202,14 @@ async def randomUtilis(ctx):
     choice = random.choice(variable)
     user = bot.get_user(choice.id)
     return user
+
+
+@bot.command(name="assigner_membre_rdm")
+async def assigner_membre_rdm(ctx):
+    user = await randomUtilis(ctx)
+    channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
+    await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
+
 
 @bot.command(name="testUser")
 async def testUser(ctx):
@@ -205,15 +219,11 @@ async def testUser(ctx):
     else:
         await ctx.channel.send("Utilisateur non trouvé")
 
+
 @bot.command(name="assigner_membre")
 async def assigner_membre(ctx):
     channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
     await channel.set_permissions(ctx.author, read_messages=True, send_messages=True, view_channel=True)
 
-@bot.command(name="assigner_membre_rdm")
-async def assigner_membre_rdm(ctx):
-    user = await randomUtilis(ctx)
-    channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
-    await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
 
 bot.run(os.getenv("TOKEN"))
