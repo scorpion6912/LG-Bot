@@ -188,6 +188,23 @@ async def xp(ctx, user: discord.User = None):
         await ctx.send(f"{user} a {xp} xp!")
 
 
+@bot.command(name="classement")
+async def classement(ctx):
+
+    with open('users.json', 'r') as f:
+        data = json.load(f)
+
+    top_users = {k: v for k, v in sorted(data.items(), key=lambda item: item[1]['points'], reverse=True)}
+
+    names = ''
+    for postion, user in enumerate(top_users):
+        names += f'{postion+1} - <@!{user}> avec {top_users[user]["points"]} points \n'
+
+    embed = discord.Embed(title=f'Classment dans le serveur: {ctx.guild.name}')
+    embed.add_field(name="NOM", value=names, inline=False)
+    await ctx.send(embed=embed)
+
+
 # A partir d'ici se sont les fonctions appeler par le bot
 def loop(ctx):
     async def coro(l: tasks.Loop):
