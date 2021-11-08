@@ -167,17 +167,30 @@ async def oui(ctx):
     await ctx.send(embed=embed)
 
 # Sondage
-async def sondage_village(ctx):
+@bot.command(name='sondage')
+async def sondage(ctx):
     liste = await liste_id_villageois(ctx)
-    liste_emoji ={1: ':zero:', 2: ':two:', 3: ':three:', 4: ':four:', 5: ':five:',6: ':sixe:', 7: ':seven:',8: ':eight',9: ':nine:'}
+    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
     i = 0
+    guild = ctx.guild
     channel_village = discord.utils.get(guild.text_channels, name='village')
-    await embed(ctx)
-while i != lengt.liste:
+    text = ""
+    while i != len(liste):
+        text = text + liste[i].name + " " + liste_emoji[i] + "\n"
+        i += 1
+    msg = await channel_village.send(text)
+    i = 0
+    while i != len(liste):
+        await msg.add_reaction(liste_emoji[i])
+        i += 1
 
-    await channel_village.send(liste[i].name,)
-    await message.add_reaction(liste_emoji[i])
-    i+=1
+async def liste_villageois(ctx):
+    channel = discord.utils.get(ctx.guild.text_channels, name='village')
+    role = discord.utils.get(ctx.guild.roles, name='Villageois')
+    name = ""
+    for member in role.members:
+        name = name + member.name + " "
+    await channel.send(str(len(role.members)) + " joueurs :" + name + "vont jouer".format(ctx))
 
 
 
