@@ -1,3 +1,4 @@
+import json
 import os
 import time
 
@@ -6,6 +7,7 @@ from dotenv import load_dotenv
 import discord
 from discord.ext import commands
 from discord.ext import tasks
+
 intents = discord.Intents.default()
 intents.members = True
 
@@ -164,20 +166,61 @@ async def startTime(ctx, time: int, count: int):
     l.after_loop(end_loop(ctx))
     l.start(l)
 
+
+@bot.command(name="add_xp")
+async def add_xp(ctx: commands.Context, user: discord.User, p):
+    await add_xp2(ctx, user, p)
+
+
+@bot.command(name="xp")
+async def xp(ctx, user: discord.User = None):
+    if not user:
+        id = ctx.message.author.id
+        with open("users.json", "r") as f:
+            users = json.load(f)
+        xp = users[str(id)]["points"]
+        await ctx.send(f"Tu as {xp} xp!")
+    else:
+        id = user.id
+        with open("users.json", "r") as f:
+            users = json.load(f)
+        xp = users[str(id)]["points"]
+        await ctx.send(f"{user} a {xp} xp!")
+
+
+@bot.command(name="classement")
+async def classement(ctx):
+
+    with open('users.json', 'r') as f:
+        data = json.load(f)
+
+    top_users = {k: v for k, v in sorted(data.items(), key=lambda item: item[1]['points'], reverse=True)}
+
+    names = ''
+    for postion, user in enumerate(top_users):
+        names += f'{postion+1} - <@!{user}> avec {top_users[user]["points"]} points \n'
+
+    embed = discord.Embed(title=f'Classment dans le serveur: {ctx.guild.name}')
+    embed.add_field(name="NOM", value=names, inline=False)
+    await ctx.send(embed=embed)
+
+
 # A partir d'ici se sont les fonctions appeler par le bot
 def loop(ctx):
     async def coro(l: tasks.Loop):
-        await ctx.send(f"Il vous reste {((l.seconds*l.count)-(l.current_loop*l.seconds))}s")
+        await ctx.send(f"Il vous reste {((l.seconds * l.count) - (l.current_loop * l.seconds))}s")
+
     return coro
 
 
 def end_loop(ctx):
     async def coro():
         await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique !")
-        #ajouter ici les inscrutions pour faire des actions
+        # ajouter ici les inscrutions pour faire des actions
+
     return coro
 
-    
+
 async def count_villageois(ctx):
     role = discord.utils.get(ctx.guild.roles, name='Villageois')
     print(len(role.members))
@@ -331,6 +374,27 @@ async def game(ctx):
     time.sleep(5)
     await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
     await channel_village.send(await liste_id_villageois(ctx))
+
+
+async def add_xp2(ctx: commands.Context, user: discord.User, p):
+    with open("users.json", "r") as f:
+        users = json.load(f)
+
+    await update_data(users, user)
+    await add_points(users, user, int(p))
+
+    with open("users.json", "w") as f:
+        json.dump(users, f)
+
+
+async def update_data(users, user):
+    if not f"{user.id}" in users:
+        users[f"{user.id}"] = {}
+        users[f"{user.id}"]["points"] = 0
+
+
+async def add_points(users, user, p):
+    users[f"{user.id}"]["points"] += p
 
 
 bot.run(os.getenv("TOKEN"))
