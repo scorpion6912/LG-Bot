@@ -204,12 +204,10 @@ async def randomUtilis(ctx):
     return user
 
 
-@bot.command(name="assigner_membre_rdm")
 async def assigner_membre_rdm(ctx):
     user = await randomUtilis(ctx)
     channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
     await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
-
 
 @bot.command(name="testUser")
 async def testUser(ctx):
@@ -220,10 +218,25 @@ async def testUser(ctx):
         await ctx.channel.send("Utilisateur non trouvé")
 
 
-@bot.command(name="assigner_membre")
 async def assigner_membre(ctx):
     channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
     await channel.set_permissions(ctx.author, read_messages=True, send_messages=True, view_channel=True)
+
+@bot.command(name="debut")
+async def debut(ctx):
+    liste = await liste_id_participant(ctx)
+    random.shuffle(liste)
+    choice = liste.pop()
+    user = bot.get_user(choice.id)
+    print("l'utilisateur va être : ", user.name.format(ctx))
+    await assigner_membre_fct(ctx, user)
+    print("l'utilisateur a bien été assigné")
+    return liste
+
+
+async def assigner_membre_fct(ctx, user):
+    channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
+    await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
 
 
 bot.run(os.getenv("TOKEN"))
