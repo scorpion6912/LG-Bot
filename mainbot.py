@@ -224,13 +224,17 @@ async def assigner_membre(ctx):
 
 @bot.command(name="debut")
 async def debut(ctx):
+    i = 0
     liste = await liste_id_participant(ctx)
     random.shuffle(liste)
-    choice = liste.pop()
-    user = bot.get_user(choice.id)
-    print("l'utilisateur va être : ", user.name.format(ctx))
-    await assigner_membre_fct(ctx, user)
-    print("l'utilisateur a bien été assigné")
+    # pour deux loup-garou
+    while (i < 2):
+        choice = liste.pop()
+        user = bot.get_user(choice.id)
+        print("l'utilisateur va être : ", user.name.format(ctx))
+        await assigner_membre_fct(ctx, user)
+        print("l'utilisateur a bien été assigné")
+        i = i + 1
     return liste
 
 
