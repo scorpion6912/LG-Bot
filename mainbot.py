@@ -1,12 +1,16 @@
 import json
 import os
+import random
 import time
+
 
 from discord import guild
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
+from discord.utils import get
 from discord.ext import tasks
+
 
 intents = discord.Intents.default()
 intents.members = True
@@ -25,6 +29,43 @@ async def on_ready():
     print('------')
 
 
+
+# Création d'un salon textuel
+@bot.command(name="setup")
+async def setup(ctx):
+    role = discord.utils.get(ctx.guild.roles, name="Villageois")
+    if role is None:
+        await ctx.guild.create_role(name="Villageois", colour=0xFF0F00, mentionable=True)
+    else:
+        await ctx.send(f"Le rôle a déjà été créer")
+    guild = ctx.guild
+    channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
+    if channel_vocal is None:
+        await guild.create_voice_channel('Village_vocal')
+        channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
+        await channel_vocal.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
+        role = discord.utils.get(ctx.guild.roles, name="Villageois")
+        await channel_vocal.set_permissions(role, read_messages=True, send_messages=True)
+    else:
+        await ctx.send(f"Le vocal a déjà été créer")
+    channel = discord.utils.get(guild.text_channels, name='village')
+    if channel is None:
+        channel = await guild.create_text_channel('village')
+        msg = await channel.send(
+            f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
+            f"la partie")
+        await msg.add_reaction('➕')
+        await msg.add_reaction('✅')
+    channel = discord.utils.get(guild.text_channels, name='loup-garou')
+    if channel is None:
+        channel = await guild.create_text_channel('loup-garou')
+        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
+
+    else:
+        await ctx.send(f"Les salons de jeux ont deja ete creer")
+
+
+
 # Création message après setup,à réagir pour savoir qui veut s'inscrire
 # S'inscrire
 @bot.event
@@ -39,9 +80,8 @@ async def on_reaction_add(reaction, ctx):
         role2 = discord.utils.get(ctx.guild.roles, name='Participant')
         msg = await channel.fetch_message(reaction.message.id)
         if msg.content == (
-                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour "
-                f"lancer "
-                f"la partie"):
+        f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
+        f"la partie"):
             await ctx.add_roles(role)
             await ctx.add_roles(role2)
             await channel.send("{0.mention} est inscrit".format(ctx))
@@ -63,6 +103,7 @@ async def on_reaction_add(reaction, ctx):
         await game(ctx)
 
 
+
 # Se désinscrire
 @bot.event
 async def on_raw_reaction_remove(payload):
@@ -74,8 +115,8 @@ async def on_raw_reaction_remove(payload):
     role = discord.utils.get(guild.roles, name='Villageois')
     msg = await channel.fetch_message(payload.message_id)
     if msg.content == (
-            f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
-            f"la partie"):
+    f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
+    f"la partie"):
         await member.remove_roles(role)
         await channel.send(f"{member.mention} est désinscrit".format(member))
     else:
@@ -104,13 +145,12 @@ async def desetup(ctx):
 # Affichage des commandes
 @bot.command(name="aled")
 async def aled(ctx):
-    embed = discord.Embed(title="foo", description="bar", color=0xFF0000)
+    embed = discord.Embed(title="tu as demande de l'aide ?", description="regarde tes mps 😉", color=0xFF0000)
     await ctx.send(embed=embed)
     await ctx.author.send("voici les commandes que tu peux utiliser".format(ctx))
     await ctx.author.send("!setup permet de créer les channels ".format(ctx))
     await ctx.author.send("!desetup permet de supprimer les channels créer par le bot".format(ctx))
     await ctx.author.send("!aled pour avoir la liste des commandes".format(ctx))
-    await ctx.channel.send("va voir tes mp".format(ctx))
 
 
 # Message privé une personne
@@ -158,6 +198,71 @@ async def join(ctx):
 @bot.command()
 async def leave(ctx):
     await ctx.voice_client.disconnect()
+
+
+# Test random pour comprendre l'utilisation
+@bot.command(name="randomtest")
+async def randomtest(ctx):
+    variable = ["pile", "face"]
+    choice = random.choice(variable)
+    await ctx.channel.send(choice)
+
+
+@bot.command(name="randomvrs")
+async def  randomvrs(ctx):
+    variablee =["Atlas","Flo", "Léo", "Claire","Rémy"]
+    random.shuffle(variablee)
+    await ctx.send(variablee.pop())
+    await ctx.send(variablee.pop())
+
+
+@bot.command(name="randomUtilis")
+async def randomUtilis(ctx):
+    variable = await liste_id_participant(ctx)
+    choice = random.choice(variable)
+    user = bot.get_user(choice.id)
+    return user
+
+
+async def assigner_membre_rdm(ctx):
+    user = await randomUtilis(ctx)
+    channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
+    await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
+
+
+@bot.command(name="testUser")
+async def testUser(ctx):
+    user = randomUtilis()
+    if user:
+        await ctx.channel.send("l'ulisateur est : " + user.name.format(ctx))
+    else:
+        await ctx.channel.send("Utilisateur non trouvé")
+
+
+async def assigner_membre(ctx):
+    channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
+    await channel.set_permissions(ctx.author, read_messages=True, send_messages=True, view_channel=True)
+
+
+@bot.command(name="debut")
+async def debut(ctx):
+    i = 0
+    liste = await liste_id_participant(ctx)
+    random.shuffle(liste)
+    # pour deux loup-garou
+    while (i < 2):
+        choice = liste.pop()
+        user = bot.get_user(choice.id)
+        print("l'utilisateur va être : ", user.name.format(ctx))
+        await assigner_membre_fct(ctx, user)
+        print("l'utilisateur a bien été assigné")
+        i = i + 1
+    return liste
+
+
+async def assigner_membre_fct(ctx, user):
+    channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
+    await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
 
 
 @bot.command(name='time')
@@ -367,7 +472,6 @@ async def game(ctx):
                                "contraire "
                                "tenterez-vous de le précipiter dans la mort ?")
     time.sleep(4)
-
     await channel_village.send("C’est la nuit, tout le village s’endort, les joueurs ferment leurs micros")
     await channel_village.send("Les Loups-Garous se réveillent, se reconnaissent et désignent une nouvelle victime !!!")
     await channel_lg.send("C'est le moment de voter")
