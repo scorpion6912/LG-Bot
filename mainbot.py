@@ -152,7 +152,6 @@ async def aled(ctx):
     await ctx.author.send("!desetup permet de supprimer les channels créer par le bot".format(ctx))
     await ctx.author.send("!aled pour avoir la liste des commandes".format(ctx))
 
-
 # Message privé une personne
 @bot.command(name="mp")
 async def download(message):
@@ -198,6 +197,39 @@ async def join(ctx):
 @bot.command()
 async def leave(ctx):
     await ctx.voice_client.disconnect()
+
+# Embed pour que sa soit plus jolie
+async def oui(ctx):
+    embed = discord.Embed(title="foo", description="bar", color=0xFF0000)
+    await ctx.send(embed=embed)
+
+# Sondage
+@bot.command(name='sondage')
+async def sondage(ctx):
+    liste = await liste_id_villageois(ctx)
+    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+    i = 0
+    guild = ctx.guild
+    channel_village = discord.utils.get(guild.text_channels, name='village')
+    text = ""
+    while i != len(liste):
+        text = text + liste[i].name + " " + liste_emoji[i] + "\n"
+        i += 1
+    msg = await channel_village.send(text)
+    i = 0
+    while i != len(liste):
+        await msg.add_reaction(liste_emoji[i])
+        i += 1
+
+async def liste_villageois(ctx):
+    channel = discord.utils.get(ctx.guild.text_channels, name='village')
+    role = discord.utils.get(ctx.guild.roles, name='Villageois')
+    name = ""
+    for member in role.members:
+        name = name + member.name + " "
+    await channel.send(str(len(role.members)) + " joueurs :" + name + "vont jouer".format(ctx))
+
+
 
 
 # Test random pour comprendre l'utilisation
