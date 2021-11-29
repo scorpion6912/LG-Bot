@@ -3,14 +3,10 @@ import os
 import random
 import time
 
-
-from discord import guild
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
-from discord.utils import get
 from discord.ext import tasks
-
 
 intents = discord.Intents.default()
 intents.members = True
@@ -29,43 +25,6 @@ async def on_ready():
     print('------')
 
 
-
-# Création d'un salon textuel
-@bot.command(name="setup")
-async def setup(ctx):
-    role = discord.utils.get(ctx.guild.roles, name="Villageois")
-    if role is None:
-        await ctx.guild.create_role(name="Villageois", colour=0xFF0F00, mentionable=True)
-    else:
-        await ctx.send(f"Le rôle a déjà été créer")
-    guild = ctx.guild
-    channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
-    if channel_vocal is None:
-        await guild.create_voice_channel('Village_vocal')
-        channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
-        await channel_vocal.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
-        role = discord.utils.get(ctx.guild.roles, name="Villageois")
-        await channel_vocal.set_permissions(role, read_messages=True, send_messages=True)
-    else:
-        await ctx.send(f"Le vocal a déjà été créer")
-    channel = discord.utils.get(guild.text_channels, name='village')
-    if channel is None:
-        channel = await guild.create_text_channel('village')
-        msg = await channel.send(
-            f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
-            f"la partie")
-        await msg.add_reaction('➕')
-        await msg.add_reaction('✅')
-    channel = discord.utils.get(guild.text_channels, name='loup-garou')
-    if channel is None:
-        channel = await guild.create_text_channel('loup-garou')
-        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
-
-    else:
-        await ctx.send(f"Les salons de jeux ont deja ete creer")
-
-
-
 # Création message après setup,à réagir pour savoir qui veut s'inscrire
 # S'inscrire
 @bot.event
@@ -80,8 +39,9 @@ async def on_reaction_add(reaction, ctx):
         role2 = discord.utils.get(ctx.guild.roles, name='Participant')
         msg = await channel.fetch_message(reaction.message.id)
         if msg.content == (
-        f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
-        f"la partie"):
+                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour "
+                f"lancer "
+                f"la partie"):
             await ctx.add_roles(role)
             await ctx.add_roles(role2)
             await channel.send("{0.mention} est inscrit".format(ctx))
@@ -101,7 +61,49 @@ async def on_reaction_add(reaction, ctx):
             return
         await liste_villageois(ctx)
         await game(ctx)
+    if "Faite le bon choix" in reaction.message.content:
+        with open("vars.json", "r") as f:
+            vars = json.load(f)
+        await add_var(ctx, ctx, 1)
+        vote = vars[str(ctx.id)]["vote"]
+        print(vote)
+        if vote > 0:
+            await reaction.message.remove_reaction(reaction.emoji, ctx)
+            await add_var(ctx, ctx, 1)
 
+
+async def add_var(ctx: commands.Context, user: discord.User, x):
+    with open("vars.json", "r") as f:
+        vars = json.load(f)
+
+    await update_var(vars, user)
+    await add_varr(vars, user, x)
+
+    with open("vars.json", "w") as f:
+        json.dump(vars, f)
+
+
+async def update_var(vars, user):
+    if not f"{user.id}" in vars:
+        vars[f"{user.id}"] = {}
+        vars[f"{user.id}"]["vote"] = 0
+
+
+async def add_varr(vars, user, x):
+    vars[f"{user.id}"]["vote"] += x
+
+
+@bot.command()
+async def var_add(ctx: commands.Context, user: discord.User = None):
+    with open("vars.json", "r") as f:
+        vars = json.load(f)
+    await set_varr(ctx, vars, user.id, 0)
+    with open("vars.json", "w") as f:
+        json.dump(vars, f)
+
+
+async def set_varr(ctx: commands.Context, vars, user, x):
+    vars[f"{user}"]["vote"] = x
 
 
 # Se désinscrire
@@ -111,16 +113,18 @@ async def on_raw_reaction_remove(payload):
     member = await bot.get_guild(payload.guild_id).fetch_member(payload.user_id)
     channel = discord.utils.get(guild.text_channels, name='village')
     if payload.channel_id != channel.id:
+        print('wtf')
         return
     role = discord.utils.get(guild.roles, name='Villageois')
     msg = await channel.fetch_message(payload.message_id)
     if msg.content == (
-    f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
-    f"la partie"):
+            f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
+            f"la partie"):
         await member.remove_roles(role)
         await channel.send(f"{member.mention} est désinscrit".format(member))
-    else:
-        print("autre channel remove")
+    if "Faite le bon choix" in msg.content:
+        print(member.id)
+        await var_add(guild, member)
 
 
 # Bot commande:
@@ -151,6 +155,7 @@ async def aled(ctx):
     await ctx.author.send("!setup permet de créer les channels ".format(ctx))
     await ctx.author.send("!desetup permet de supprimer les channels créer par le bot".format(ctx))
     await ctx.author.send("!aled pour avoir la liste des commandes".format(ctx))
+
 
 # Message privé une personne
 @bot.command(name="mp")
@@ -198,28 +203,6 @@ async def join(ctx):
 async def leave(ctx):
     await ctx.voice_client.disconnect()
 
-# Embed pour que sa soit plus jolie
-async def oui(ctx):
-    embed = discord.Embed(title="foo", description="bar", color=0xFF0000)
-    await ctx.send(embed=embed)
-
-# Sondage
-@bot.command(name='sondage')
-async def sondage(ctx):
-    liste = await liste_id_villageois(ctx)
-    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
-    i = 0
-    guild = ctx.guild
-    channel_village = discord.utils.get(guild.text_channels, name='village')
-    text = ""
-    while i != len(liste):
-        text = text + liste[i].name + " " + liste_emoji[i] + "\n"
-        i += 1
-    msg = await channel_village.send(text)
-    i = 0
-    while i != len(liste):
-        await msg.add_reaction(liste_emoji[i])
-        i += 1
 
 async def liste_villageois(ctx):
     channel = discord.utils.get(ctx.guild.text_channels, name='village')
@@ -228,8 +211,6 @@ async def liste_villageois(ctx):
     for member in role.members:
         name = name + member.name + " "
     await channel.send(str(len(role.members)) + " joueurs :" + name + "vont jouer".format(ctx))
-
-
 
 
 # Test random pour comprendre l'utilisation
@@ -241,8 +222,8 @@ async def randomtest(ctx):
 
 
 @bot.command(name="randomvrs")
-async def  randomvrs(ctx):
-    variablee =["Atlas","Flo", "Léo", "Claire","Rémy"]
+async def randomvrs(ctx):
+    variablee = ["Atlas", "Flo", "Léo", "Claire", "Rémy"]
     random.shuffle(variablee)
     await ctx.send(variablee.pop())
     await ctx.send(variablee.pop())
@@ -327,7 +308,6 @@ async def xp(ctx, user: discord.User = None):
 
 @bot.command(name="classement")
 async def classement(ctx):
-
     with open('users.json', 'r') as f:
         data = json.load(f)
 
@@ -335,11 +315,53 @@ async def classement(ctx):
 
     names = ''
     for postion, user in enumerate(top_users):
-        names += f'{postion+1} - <@!{user}> avec {top_users[user]["points"]} points \n'
+        names += f'{postion + 1} - <@!{user}> avec {top_users[user]["points"]} points \n'
 
     embed = discord.Embed(title=f'Classment dans le serveur: {ctx.guild.name}')
     embed.add_field(name="NOM", value=names, inline=False)
     await ctx.send(embed=embed)
+
+
+@bot.command(name="kill")
+async def kill(ctx, user: discord.User):
+    guild = ctx.guild
+    member = guild.get_member(user.id)
+    role = discord.utils.get(ctx.guild.roles, name='Villageois')
+    role2 = discord.utils.get(ctx.guild.roles, name='Mort')
+    await member.remove_roles(role)
+    await member.add_roles(role2)
+
+
+@bot.command(name="mute")
+async def mute(ctx, setting):
+    voice_channel = discord.utils.get(ctx.guild.channels, name="Village_vocal")
+    for member in voice_channel.members:
+        if setting.lower() == 'true':
+            await member.edit(mute=True)
+        elif setting.lower() == 'false':
+            await member.edit(mute=False)
+
+
+@bot.command(name='sondage')
+async def sondage(ctx, x, y):
+    liste = await liste_id_villageois(ctx)
+    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+    nb = await count_villageois(ctx)
+    lst = [0] * nb
+    i = 0
+    guild = ctx.guild
+    channel_village = discord.utils.get(guild.text_channels, name='village')
+    text = ""
+    while i != len(liste):
+        text = text + liste[i].name + " " + liste_emoji[i] + "\n"
+        i += 1
+    text = text + "Faite le bon choix"
+    msg = await channel_village.send(text)
+    i = 0
+    while i != len(liste):
+        await msg.add_reaction(liste_emoji[i])
+        i += 1
+    await startTime(ctx, int(x), int(y))
 
 
 # A partir d'ici se sont les fonctions appeler par le bot
@@ -353,7 +375,23 @@ def loop(ctx):
 def end_loop(ctx):
     async def coro():
         await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique !")
-        # ajouter ici les inscrutions pour faire des actions
+        liste = await liste_id_villageois(ctx)
+        liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+        nb = await count_villageois(ctx)
+        lst = [0] * nb
+        guild = ctx.guild
+        channel_village = discord.utils.get(guild.text_channels, name='village')
+        msg = discord.utils.get(await channel_village.history(limit=100).flatten(), author=bot)
+        print(msg)
+        v = 0
+        while (v < len(liste)):
+            emojii = liste_emoji[v]
+            m = await channel_village.fetch_message(msg.id)
+            react = discord.utils.get(m.reactions, emoji=emojii)
+            a = react.count
+            lst[v] += a
+            v = v + 1
+        await channel_village.send(lst)
 
     return coro
 
@@ -367,15 +405,6 @@ async def count_villageois(ctx):
 async def liste_id_participant(ctx):
     role = discord.utils.get(ctx.guild.roles, name='Participant')
     return role.members
-
-
-async def liste_villageois(ctx):
-    channel = discord.utils.get(ctx.guild.text_channels, name='village')
-    role = discord.utils.get(ctx.guild.roles, name='Villageois')
-    name = ""
-    for member in role.members:
-        name = name + member.name + " "
-    await channel.send(str(len(role.members)) + " joueurs :" + name + "vont jouer".format(ctx))
 
 
 async def liste_id_villageois(ctx):
