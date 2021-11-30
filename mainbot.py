@@ -66,10 +66,11 @@ async def on_reaction_add(reaction, ctx):
             vars = json.load(f)
         await add_var(ctx, ctx, 1)
         vote = vars[str(ctx.id)]["vote"]
-        print(vote)
         if vote > 0:
             await reaction.message.remove_reaction(reaction.emoji, ctx)
+            await channel.send("Il n'est pas possible de voter pour deux personne différente")
             await add_var(ctx, ctx, 1)
+            print("add")
 
 
 async def add_var(ctx: commands.Context, user: discord.User, x):
@@ -123,8 +124,15 @@ async def on_raw_reaction_remove(payload):
         await member.remove_roles(role)
         await channel.send(f"{member.mention} est désinscrit".format(member))
     if "Faite le bon choix" in msg.content:
-        print(member.id)
-        await var_add(guild, member)
+        #await var_add(guild, member)
+        await add_var(guild, member, -2)
+        print("remove")
+        with open("vars.json", "r") as f:
+            vars = json.load(f)
+        vote = vars[str(member.id)]["vote"]
+        print(vote)
+        if vote < 0:
+            await add_var(guild, member, 1)
 
 
 # Bot commande:
@@ -279,9 +287,9 @@ async def assigner_membre_fct(ctx, user):
 
 
 @bot.command(name='time')
-async def startTime(ctx, time: int, count: int):
+async def startTime(ctx, time: int, count: int,msg):
     l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
-    l.after_loop(end_loop(ctx))
+    l.after_loop(end_loop(ctx,msg))
     l.start(l)
 
 
@@ -353,6 +361,7 @@ async def sondage(ctx, x, y):
     channel_village = discord.utils.get(guild.text_channels, name='village')
     text = ""
     while i != len(liste):
+        await add_var(ctx, liste[i], 0)
         text = text + liste[i].name + " " + liste_emoji[i] + "\n"
         i += 1
     text = text + "Faite le bon choix"
@@ -361,7 +370,7 @@ async def sondage(ctx, x, y):
     while i != len(liste):
         await msg.add_reaction(liste_emoji[i])
         i += 1
-    await startTime(ctx, int(x), int(y))
+    await startTime(ctx, int(x), int(y),msg)
 
 
 # A partir d'ici se sont les fonctions appeler par le bot
@@ -372,7 +381,7 @@ def loop(ctx):
     return coro
 
 
-def end_loop(ctx):
+def end_loop(ctx,msg):
     async def coro():
         await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique !")
         liste = await liste_id_villageois(ctx)
@@ -381,8 +390,8 @@ def end_loop(ctx):
         lst = [0] * nb
         guild = ctx.guild
         channel_village = discord.utils.get(guild.text_channels, name='village')
-        msg = discord.utils.get(await channel_village.history(limit=100).flatten(), author=bot)
-        print(msg)
+        if "Faite le bon choix" in msg.content:
+            print(msg)
         v = 0
         while (v < len(liste)):
             emojii = liste_emoji[v]
