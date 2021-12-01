@@ -126,11 +126,9 @@ async def on_raw_reaction_remove(payload):
     if "Faite le bon choix" in msg.content:
         #await var_add(guild, member)
         await add_var(guild, member, -2)
-        print("remove")
         with open("vars.json", "r") as f:
             vars = json.load(f)
         vote = vars[str(member.id)]["vote"]
-        print(vote)
         if vote < 0:
             await add_var(guild, member, 1)
 
@@ -362,6 +360,11 @@ async def sondage(ctx, x, y):
     text = ""
     while i != len(liste):
         await add_var(ctx, liste[i], 0)
+        with open("vars.json", "r") as f:
+            vars = json.load(f)
+        vote = vars[str(liste[i].id)]["vote"]
+        if vote > 0:
+            await add_var(guild, liste[i], -1)
         text = text + liste[i].name + " " + liste_emoji[i] + "\n"
         i += 1
     text = text + "Faite le bon choix"
