@@ -70,7 +70,6 @@ async def on_reaction_add(reaction, ctx):
             await reaction.message.remove_reaction(reaction.emoji, ctx)
             await channel.send("Il n'est pas possible de voter pour deux personne différente")
             await add_var(ctx, ctx, 1)
-            print("add")
 
 
 async def add_var(ctx: commands.Context, user: discord.User, x):
@@ -94,19 +93,6 @@ async def add_varr(vars, user, x):
     vars[f"{user.id}"]["vote"] += x
 
 
-@bot.command()
-async def var_add(ctx: commands.Context, user: discord.User = None):
-    with open("vars.json", "r") as f:
-        vars = json.load(f)
-    await set_varr(ctx, vars, user.id, 0)
-    with open("vars.json", "w") as f:
-        json.dump(vars, f)
-
-
-async def set_varr(ctx: commands.Context, vars, user, x):
-    vars[f"{user}"]["vote"] = x
-
-
 # Se désinscrire
 @bot.event
 async def on_raw_reaction_remove(payload):
@@ -114,7 +100,6 @@ async def on_raw_reaction_remove(payload):
     member = await bot.get_guild(payload.guild_id).fetch_member(payload.user_id)
     channel = discord.utils.get(guild.text_channels, name='village')
     if payload.channel_id != channel.id:
-        print('wtf')
         return
     role = discord.utils.get(guild.roles, name='Villageois')
     msg = await channel.fetch_message(payload.message_id)
@@ -393,8 +378,6 @@ def end_loop(ctx,msg):
         lst = [0] * nb
         guild = ctx.guild
         channel_village = discord.utils.get(guild.text_channels, name='village')
-        if "Faite le bon choix" in msg.content:
-            print(msg)
         v = 0
         while (v < len(liste)):
             emojii = liste_emoji[v]
@@ -403,14 +386,30 @@ def end_loop(ctx,msg):
             a = react.count
             lst[v] += a
             v = v + 1
-        await channel_village.send(lst)
+        i = 0
+        j = lst[i]
+        i = 1
+        x = 0
+        pos = 0
+        while i != len(lst):
+            if lst[i] == j:
+                x = x+1
+            if lst[i] > j:
+                pos = i
+                j = lst[i]
+                x = 0
+            i = i+1
+        if x >= 1:
+            await channel_village.send("Il y a une egalité personne ne meurt")
+        else:
+            await kill(ctx, liste[pos])
+            await channel_village.send(f"Le mort est: {liste[pos]}")
 
     return coro
 
 
 async def count_villageois(ctx):
     role = discord.utils.get(ctx.guild.roles, name='Villageois')
-    print(len(role.members))
     return len(role.members)
 
 
