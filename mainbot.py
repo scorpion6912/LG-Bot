@@ -204,57 +204,15 @@ async def liste_villageois(ctx):
     await channel.send(str(len(role.members)) + " joueurs :" + name + "vont jouer".format(ctx))
 
 
-# Test random pour comprendre l'utilisation
-@bot.command(name="randomtest")
-async def randomtest(ctx):
-    variable = ["pile", "face"]
-    choice = random.choice(variable)
-    await ctx.channel.send(choice)
-
-
-@bot.command(name="randomvrs")
-async def randomvrs(ctx):
-    variablee = ["Atlas", "Flo", "Léo", "Claire", "Rémy"]
-    random.shuffle(variablee)
-    await ctx.send(variablee.pop())
-    await ctx.send(variablee.pop())
-
-
-@bot.command(name="randomUtilis")
-async def randomUtilis(ctx):
-    variable = await liste_id_participant(ctx)
-    choice = random.choice(variable)
-    user = bot.get_user(choice.id)
-    return user
-
-
-async def assigner_membre_rdm(ctx):
-    user = await randomUtilis(ctx)
-    channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
-    await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
-
-
-@bot.command(name="testUser")
-async def testUser(ctx):
-    user = randomUtilis()
-    if user:
-        await ctx.channel.send("l'ulisateur est : " + user.name.format(ctx))
-    else:
-        await ctx.channel.send("Utilisateur non trouvé")
-
-
-async def assigner_membre(ctx):
-    channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
-    await channel.set_permissions(ctx.author, read_messages=True, send_messages=True, view_channel=True)
-
-
-@bot.command(name="debut")
-async def debut(ctx):
+async def choix_lg(ctx):
     i = 0
     liste = await liste_id_participant(ctx)
     random.shuffle(liste)
     # pour deux loup-garou
-    while (i < 2):
+    j = round(len(liste)/5)
+    if j == 0:
+        j = 1
+    while i < j:
         choice = liste.pop()
         user = bot.get_user(choice.id)
         print("l'utilisateur va être : ", user.name.format(ctx))
@@ -341,7 +299,6 @@ async def sondage(ctx, x, y):
     lst = [0] * nb
     i = 0
     guild = ctx.guild
-    channel_village = discord.utils.get(guild.text_channels, name='village')
     text = ""
     while i != len(liste):
         await add_var(ctx, liste[i], 0)
@@ -353,7 +310,7 @@ async def sondage(ctx, x, y):
         text = text + liste[i].name + " " + liste_emoji[i] + "\n"
         i += 1
     text = text + "Faite le bon choix"
-    msg = await channel_village.send(text)
+    msg = await ctx.send(text)
     i = 0
     while i != len(liste):
         await msg.add_reaction(liste_emoji[i])
@@ -379,9 +336,9 @@ def end_loop(ctx,msg):
         guild = ctx.guild
         channel_village = discord.utils.get(guild.text_channels, name='village')
         v = 0
-        while (v < len(liste)):
+        while v < len(liste):
             emojii = liste_emoji[v]
-            m = await channel_village.fetch_message(msg.id)
+            m = await ctx.fetch_message(msg.id)
             react = discord.utils.get(m.reactions, emoji=emojii)
             a = react.count
             lst[v] += a
@@ -528,6 +485,7 @@ async def game(ctx):
     channel_lg = discord.utils.get(guild.text_channels, name='loup-garou')
     channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
     role_villageois = discord.utils.get(ctx.guild.roles, name="Villageois")
+    await choix_lg(channel_village)
     await channel_village.send("Il fait sombre, la lumière de la lune traverse à peine les nuages pour révéler le "
                                "village de "
                                "Thiercelieux. Une petite bourgade sans prétention et paisible coincée dans les "
@@ -547,9 +505,8 @@ async def game(ctx):
     await channel_village.send("C’est la nuit, tout le village s’endort, les joueurs ferment leurs micros")
     await channel_village.send("Les Loups-Garous se réveillent, se reconnaissent et désignent une nouvelle victime !!!")
     await channel_lg.send("C'est le moment de voter")
-    time.sleep(5)
+    await sondage(channel_lg, 10, 3)
     await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
-    await channel_village.send(await liste_id_villageois(ctx))
 
 
 async def add_xp2(ctx: commands.Context, user: discord.User, p):
