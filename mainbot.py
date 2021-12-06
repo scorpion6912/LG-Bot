@@ -55,12 +55,11 @@ async def on_reaction_add(reaction, ctx):
         await channel.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
         if await count_villageois(ctx) < 2:
             await channel.send("impossible de lancer a moins de 4")
-            time.sleep(3)
             await botdesetup(ctx)
             await botsetup(ctx)
             return
         await liste_villageois(ctx)
-        await game(ctx)
+        await nuit_un(ctx)
     if "Faite le bon choix" in reaction.message.content:
         with open("vars.json", "r") as f:
             vars = json.load(f)
@@ -227,11 +226,6 @@ async def assigner_membre_fct(ctx, user):
     await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
 
 
-@bot.command(name='time')
-async def startTime(ctx, time: int, count: int,msg):
-    l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
-    l.after_loop(end_loop(ctx,msg))
-    l.start(l)
 
 
 @bot.command(name="add_xp")
@@ -315,10 +309,22 @@ async def sondage(ctx, x, y):
     while i != len(liste):
         await msg.add_reaction(liste_emoji[i])
         i += 1
-    await startTime(ctx, int(x), int(y),msg)
+    await nuit_un_timer(ctx, int(x), int(y),msg)
 
 
 # A partir d'ici se sont les fonctions appeler par le bot
+async def nuit_un_timer(ctx, time: int, count: int,msg):
+    l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
+    l.after_loop(nuit_un_end_loop(ctx,msg))
+    l.start(l)
+
+
+async def jour_timer(ctx, time: int, count: int,msg):
+    l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
+    l.after_loop(jour_loop(ctx,msg))
+    l.start(l)
+
+
 def loop(ctx):
     async def coro(l: tasks.Loop):
         await ctx.send(f"Il vous reste {((l.seconds * l.count) - (l.current_loop * l.seconds))}s")
@@ -326,7 +332,12 @@ def loop(ctx):
     return coro
 
 
-def end_loop(ctx,msg):
+def jour_loop(ctx, msg):
+    async def coro():
+        return coro
+
+
+def nuit_un_end_loop(ctx, msg):
     async def coro():
         await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique !")
         liste = await liste_id_villageois(ctx)
@@ -479,7 +490,7 @@ async def botsetup(ctx):
         await ctx.send(f"voyante est déjà créer")
 
 
-async def game(ctx):
+async def nuit_un(ctx):
     guild = ctx.guild
     channel_village = discord.utils.get(guild.text_channels, name='village')
     channel_lg = discord.utils.get(guild.text_channels, name='loup-garou')
@@ -501,7 +512,6 @@ async def game(ctx):
                                "la nuit pour dévorer les innocents. Aideriez-vous le village à survivre ou au "
                                "contraire "
                                "tenterez-vous de le précipiter dans la mort ?")
-    time.sleep(4)
     await channel_village.send("C’est la nuit, tout le village s’endort, les joueurs ferment leurs micros")
     await channel_village.send("Les Loups-Garous se réveillent, se reconnaissent et désignent une nouvelle victime !!!")
     await channel_lg.send("C'est le moment de voter")
