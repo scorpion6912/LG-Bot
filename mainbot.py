@@ -1,7 +1,6 @@
 import json
 import os
 import random
-import time
 
 from dotenv import load_dotenv
 import discord
@@ -32,7 +31,10 @@ async def on_reaction_add(reaction, ctx):
     if ctx.id == bot.user.id:
         return
     channel = discord.utils.get(ctx.guild.text_channels, name='village')
-    if reaction.message.channel.id != channel.id:
+    channel2 = discord.utils.get(ctx.guild.text_channels, name='village')
+    if reaction.message.channel.id == channel.id or reaction.message.channel.id == channel2.id:
+        print("ok")
+    else:
         return
     if reaction.emoji == "➕":
         role = discord.utils.get(ctx.guild.roles, name='Villageois')
@@ -82,10 +84,26 @@ async def add_var(ctx: commands.Context, user: discord.User, x):
         json.dump(vars, f)
 
 
+async def add_role(ctx: commands.Context, user: discord.User, x):
+    with open("vars.json", "r") as f:
+        vars = json.load(f)
+
+    await update_var(vars, user)
+    await add_rrole(vars, user, x)
+
+    with open("vars.json", "w") as f:
+        json.dump(vars, f)
+
+
+async def add_rrole(vars, user, x):
+    vars[f"{user.id}"]["role"] += x
+
+
 async def update_var(vars, user):
     if not f"{user.id}" in vars:
         vars[f"{user.id}"] = {}
         vars[f"{user.id}"]["vote"] = 0
+        vars[f"{user.id}"]["role"] = 0
 
 
 async def add_varr(vars, user, x):
@@ -98,23 +116,25 @@ async def on_raw_reaction_remove(payload):
     guild = bot.get_guild(payload.guild_id)
     member = await bot.get_guild(payload.guild_id).fetch_member(payload.user_id)
     channel = discord.utils.get(guild.text_channels, name='village')
-    if payload.channel_id != channel.id:
+    channel2 = discord.utils.get(guild.text_channels, name='village')
+    if payload.channel_id == channel.id or payload.channel_id == channel2.id:
+        role = discord.utils.get(guild.roles, name='Villageois')
+        msg = await channel.fetch_message(payload.message_id)
+        if msg.content == (
+                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
+                f"la partie"):
+            await member.remove_roles(role)
+            await channel.send(f"{member.mention} est désinscrit".format(member))
+        if "Faite le bon choix" in msg.content:
+            #await var_add(guild, member)
+            await add_var(guild, member, -2)
+            with open("vars.json", "r") as f:
+                vars = json.load(f)
+            vote = vars[str(member.id)]["vote"]
+            if vote < 0:
+                await add_var(guild, member, 1)
+    else:
         return
-    role = discord.utils.get(guild.roles, name='Villageois')
-    msg = await channel.fetch_message(payload.message_id)
-    if msg.content == (
-            f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
-            f"la partie"):
-        await member.remove_roles(role)
-        await channel.send(f"{member.mention} est désinscrit".format(member))
-    if "Faite le bon choix" in msg.content:
-        #await var_add(guild, member)
-        await add_var(guild, member, -2)
-        with open("vars.json", "r") as f:
-            vars = json.load(f)
-        vote = vars[str(member.id)]["vote"]
-        if vote < 0:
-            await add_var(guild, member, 1)
 
 
 # Bot commande:
@@ -215,6 +235,7 @@ async def choix_lg(ctx):
         choice = liste.pop()
         user = bot.get_user(choice.id)
         print("l'utilisateur va être : ", user.name.format(ctx))
+        await add_role(ctx, user, 3)
         await assigner_membre_fct(ctx, user)
         print("l'utilisateur a bien été assigné")
         i = i + 1
@@ -224,8 +245,6 @@ async def choix_lg(ctx):
 async def assigner_membre_fct(ctx, user):
     channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
     await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
-
-
 
 
 @bot.command(name="add_xp")
@@ -367,6 +386,7 @@ def nuit_un_end_loop(ctx, msg):
                 j = lst[i]
                 x = 0
             i = i+1
+        await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
         if x >= 1:
             await channel_village.send("Il y a une egalité personne ne meurt")
         else:
@@ -516,7 +536,7 @@ async def nuit_un(ctx):
     await channel_village.send("Les Loups-Garous se réveillent, se reconnaissent et désignent une nouvelle victime !!!")
     await channel_lg.send("C'est le moment de voter")
     await sondage(channel_lg, 10, 3)
-    await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
+
 
 
 async def add_xp2(ctx: commands.Context, user: discord.User, p):
