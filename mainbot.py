@@ -31,9 +31,9 @@ async def on_reaction_add(reaction, ctx):
     if ctx.id == bot.user.id:
         return
     channel = discord.utils.get(ctx.guild.text_channels, name='village')
-    channel2 = discord.utils.get(ctx.guild.text_channels, name='village')
+    channel2 = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
     if reaction.message.channel.id == channel.id or reaction.message.channel.id == channel2.id:
-        print("ok")
+        chan = bot.get_channel(reaction.message.channel.id)
     else:
         return
     if reaction.emoji == "➕":
@@ -69,7 +69,7 @@ async def on_reaction_add(reaction, ctx):
         vote = vars[str(ctx.id)]["vote"]
         if vote > 0:
             await reaction.message.remove_reaction(reaction.emoji, ctx)
-            await channel.send("Il n'est pas possible de voter pour deux personne différente")
+            await chan.send("Il n'est pas possible de voter pour deux personne différente")
             await add_var(ctx, ctx, 1)
 
 
@@ -116,10 +116,11 @@ async def on_raw_reaction_remove(payload):
     guild = bot.get_guild(payload.guild_id)
     member = await bot.get_guild(payload.guild_id).fetch_member(payload.user_id)
     channel = discord.utils.get(guild.text_channels, name='village')
-    channel2 = discord.utils.get(guild.text_channels, name='village')
+    channel2 = discord.utils.get(guild.text_channels, name='loup-garou')
     if payload.channel_id == channel.id or payload.channel_id == channel2.id:
         role = discord.utils.get(guild.roles, name='Villageois')
-        msg = await channel.fetch_message(payload.message_id)
+        chan = bot.get_channel(payload.channel_id)
+        msg = await chan.fetch_message(payload.message_id)
         if msg.content == (
                 f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
                 f"la partie"):
