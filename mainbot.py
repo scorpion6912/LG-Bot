@@ -228,18 +228,20 @@ async def choix_lg(ctx):
     i = 0
     liste = await liste_id_participant(ctx)
     random.shuffle(liste)
+    channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
     # pour deux loup-garou
     j = round(len(liste)/5)
+    text = "Les loup-garous sont: "
     if j == 0:
         j = 1
     while i < j:
         choice = liste.pop()
         user = bot.get_user(choice.id)
-        print("l'utilisateur va être : ", user.name.format(ctx))
         await add_role(ctx, user, 3)
         await assigner_membre_fct(ctx, user)
-        print("l'utilisateur a bien été assigné")
+        text = text + "<@" + str(user.id) + ">" + " "
         i = i + 1
+    await channel.send(text.format(ctx))
     return liste
 
 
