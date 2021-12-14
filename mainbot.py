@@ -390,11 +390,12 @@ def nuit_un_end_loop(ctx, msg):
                 x = 0
             i = i+1
         await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
+        await channel_village.send("Le Village ce réveille et apprend que durant la nuit:")
         if x >= 1:
-            await channel_village.send("Il y a une egalité personne ne meurt")
+            await channel_village.send("Il y a une égalité et personne ne meurt")
         else:
             await kill(ctx, liste[pos])
-            await channel_village.send(f"Le mort est: {liste[pos]}")
+            await channel_village.send(f"{liste[pos].mention} est mort".format(ctx))
 
     return coro
 
