@@ -127,7 +127,7 @@ async def on_raw_reaction_remove(payload):
             await member.remove_roles(role)
             await channel.send(f"{member.mention} est désinscrit".format(member))
         if "Faite le bon choix" in msg.content:
-            #await var_add(guild, member)
+            # await var_add(guild, member)
             await add_var(guild, member, -2)
             with open("vars.json", "r") as f:
                 vars = json.load(f)
@@ -230,7 +230,7 @@ async def choix_lg(ctx):
     random.shuffle(liste)
     channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
     # pour deux loup-garou
-    j = round(len(liste)/5)
+    j = round(len(liste) / 5)
     text = "Les loup-garous sont: "
     if j == 0:
         j = 1
@@ -331,7 +331,7 @@ async def sondage(ctx, x, y):
     while i != len(liste):
         await msg.add_reaction(liste_emoji[i])
         i += 1
-    await nuit_un_timer(ctx, int(x), int(y),msg)
+    await nuit_un_timer(ctx, int(x), int(y), msg)
 
 
 # A partir d'ici se sont les fonctions appeler par le bot
@@ -395,12 +395,12 @@ def nuit_un_end_loop(ctx, msg):
         pos = 0
         while i != len(lst):
             if lst[i] == j:
-                x = x+1
+                x = x + 1
             if lst[i] > j:
                 pos = i
                 j = lst[i]
                 x = 0
-            i = i+1
+            i = i + 1
         await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
         await channel_village.send("Le Village ce réveille et apprend que durant la nuit:")
         if x >= 1:
@@ -554,7 +554,6 @@ async def nuit_un(ctx):
     await sondage(channel_lg, 10, 3)
 
 
-
 async def add_xp2(ctx: commands.Context, user: discord.User, p):
     with open("users.json", "r") as f:
         users = json.load(f)
@@ -574,6 +573,31 @@ async def update_data(users, user):
 
 async def add_points(users, user, p):
     users[f"{user.id}"]["points"] += p
+
+
+@bot.command(name="check_fin")
+async def check_fin(ctx):
+    print("a")
+    liste = await liste_id_participant(ctx)
+    channel_village = discord.utils.get(ctx.guild.text_channels, name='village')
+    i = 0
+    lg = 0
+    villageois = 0
+    while i != len(liste):
+        await add_var(ctx, liste[i], 0)
+        with open("vars.json", "r") as f:
+            vars = json.load(f)
+        role = vars[str(liste[i].id)]["role"]
+        if role == 3:
+            lg = lg+1
+        if role == 0:
+            villageois = villageois + 1
+        i = i + 1
+    if lg > villageois:
+        await channel_village.send("Les loup garous on gagné")
+        return
+    else:
+        await channel_village.send("La partie continue")
 
 
 bot.run(os.getenv("TOKEN"))
