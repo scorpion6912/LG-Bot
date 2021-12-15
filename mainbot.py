@@ -295,6 +295,12 @@ async def kill(ctx, user: discord.User):
     role2 = discord.utils.get(ctx.guild.roles, name='Mort')
     await member.remove_roles(role)
     await member.add_roles(role2)
+    with open("vars.json", "r") as f:
+        vars = json.load(f)
+    role = vars[str(member.id)]["role"]
+    while role > 1:
+        await add_role(guild, member, -1)
+        role = role - 1
 
 
 @bot.command(name="mute")
@@ -377,7 +383,7 @@ def nuit_un_end_loop(ctx, msg):
         liste = await liste_id_villageois(ctx)
         await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique !")
         channel_village = discord.utils.get(guild.text_channels, name='village')
-        x, pos = await count_react(ctx,msg)
+        x, pos = await count_react(ctx, msg)
         await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
         await channel_village.send("Le Village ce réveille et apprend que durant la nuit:")
         if x >= 1:
@@ -385,16 +391,21 @@ def nuit_un_end_loop(ctx, msg):
         else:
             await kill(ctx, liste[pos])
             await channel_village.send(f"{liste[pos].mention} est mort".format(ctx))
+        x = await check_fin(ctx)
+        if x == 1:
+            await channel_village.send("La partie est terminer")
+            return -1
+        else:
+            print("await suite game")
 
     return coro
 
 
-async def count_react(ctx,msg):
+async def count_react(ctx, msg):
     liste = await liste_id_villageois(ctx)
     liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
     nb = await count_villageois(ctx)
     lst = [0] * nb
-    guild = ctx.guild
     v = 0
     while v < len(liste):
         emojii = liste_emoji[v]
@@ -539,6 +550,17 @@ async def nuit_un(ctx):
     channel_lg = discord.utils.get(guild.text_channels, name='loup-garou')
     channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
     role_villageois = discord.utils.get(ctx.guild.roles, name="Villageois")
+    i = 0
+    liste = await liste_id_villageois(ctx)
+    while i != len(liste):
+        await add_var(ctx, liste[i], 0)
+        with open("vars.json", "r") as f:
+            vars = json.load(f)
+        role = vars[str(liste[i].id)]["role"]
+        while role > 0:
+            await add_role(guild, liste[i], -1)
+            role = role - 1
+        i += 1
     await choix_lg(channel_village)
     await channel_village.send("Il fait sombre, la lumière de la lune traverse à peine les nuages pour révéler le "
                                "village de "
@@ -600,10 +622,13 @@ async def check_fin(ctx):
             villageois = villageois + 1
         i = i + 1
     if lg > villageois:
-        await channel_village.send("Les loup garous on gagné")
-        return
-    else:
-        await channel_village.send("La partie continue")
+        await channel_village.send("Les loup garous ont gagné")
+        return 1
+    if lg == 0:
+        await channel_village.send("Les villageois ont gagné")
+        return 1
+    if villageois >= lg:
+        return 0
 
 
 bot.run(os.getenv("TOKEN"))
