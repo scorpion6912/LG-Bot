@@ -373,34 +373,11 @@ def loop(ctx):
 
 def nuit_un_end_loop(ctx, msg):
     async def coro():
-        await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique !")
-        liste = await liste_id_villageois(ctx)
-        liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
-        nb = await count_villageois(ctx)
-        lst = [0] * nb
         guild = ctx.guild
+        liste = await liste_id_villageois(ctx)
+        await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique !")
         channel_village = discord.utils.get(guild.text_channels, name='village')
-        v = 0
-        while v < len(liste):
-            emojii = liste_emoji[v]
-            m = await ctx.fetch_message(msg.id)
-            react = discord.utils.get(m.reactions, emoji=emojii)
-            a = react.count
-            lst[v] += a
-            v = v + 1
-        i = 0
-        j = lst[i]
-        i = 1
-        x = 0
-        pos = 0
-        while i != len(lst):
-            if lst[i] == j:
-                x = x + 1
-            if lst[i] > j:
-                pos = i
-                j = lst[i]
-                x = 0
-            i = i + 1
+        x, pos = await count_react(ctx,msg)
         await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
         await channel_village.send("Le Village ce réveille et apprend que durant la nuit:")
         if x >= 1:
@@ -410,6 +387,36 @@ def nuit_un_end_loop(ctx, msg):
             await channel_village.send(f"{liste[pos].mention} est mort".format(ctx))
 
     return coro
+
+
+async def count_react(ctx,msg):
+    liste = await liste_id_villageois(ctx)
+    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+    nb = await count_villageois(ctx)
+    lst = [0] * nb
+    guild = ctx.guild
+    v = 0
+    while v < len(liste):
+        emojii = liste_emoji[v]
+        m = await ctx.fetch_message(msg.id)
+        react = discord.utils.get(m.reactions, emoji=emojii)
+        a = react.count
+        lst[v] += a
+        v = v + 1
+    i = 0
+    j = lst[i]
+    i = 1
+    x = 0
+    pos = 0
+    while i != len(lst):
+        if lst[i] == j:
+            x = x + 1
+        if lst[i] > j:
+            pos = i
+            j = lst[i]
+            x = 0
+        i = i + 1
+    return x, pos
 
 
 async def count_villageois(ctx):
@@ -577,7 +584,6 @@ async def add_points(users, user, p):
 
 @bot.command(name="check_fin")
 async def check_fin(ctx):
-    print("a")
     liste = await liste_id_participant(ctx)
     channel_village = discord.utils.get(ctx.guild.text_channels, name='village')
     i = 0
