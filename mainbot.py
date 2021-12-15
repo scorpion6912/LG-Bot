@@ -335,16 +335,33 @@ async def sondage(ctx, x, y):
 
 
 # A partir d'ici se sont les fonctions appeler par le bot
-async def nuit_un_timer(ctx, time: int, count: int,msg):
+async def nuit_un_timer(ctx, time: int, count: int, msg):
     l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
-    l.after_loop(nuit_un_end_loop(ctx,msg))
+    l.after_loop(nuit_un_end_loop(ctx, msg))
     l.start(l)
 
 
-async def jour_timer(ctx, time: int, count: int,msg):
-    l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
-    l.after_loop(jour_loop(ctx,msg))
+@bot.command(name="tiiime")
+async def tiiime(ctx, x, y):
+    await timer_invisible(ctx, int(x), int(y), None)
+
+
+async def timer_invisible(ctx, time: int, count: int, msg):
+    l = tasks.Loop(loop_invisible(ctx), time, 0, 0, count, True, None)
+    l.after_loop(end_loop_invisible(ctx, msg))
     l.start(l)
+
+
+def loop_invisible(ctx):
+    async def coro(l: tasks.Loop):
+        print("un")
+    return coro
+
+
+def end_loop_invisible(ctx, msg):
+    async def coro():
+        print("deux")
+    return coro
 
 
 def loop(ctx):
@@ -352,11 +369,6 @@ def loop(ctx):
         await ctx.send(f"Il vous reste {((l.seconds * l.count) - (l.current_loop * l.seconds))}s")
 
     return coro
-
-
-def jour_loop(ctx, msg):
-    async def coro():
-        return coro
 
 
 def nuit_un_end_loop(ctx, msg):
