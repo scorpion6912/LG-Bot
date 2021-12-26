@@ -227,6 +227,10 @@ async def liste_villageois(ctx):
 async def choix_lg(ctx):
     i = 0
     liste = await liste_id_participant(ctx)
+    x=0
+    while x < len(liste):
+        await add_role(ctx, liste[x], 1)
+        x = x + 1
     random.shuffle(liste)
     channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
     # pour deux loup-garou
@@ -237,7 +241,7 @@ async def choix_lg(ctx):
     while i < j:
         choice = liste.pop()
         user = bot.get_user(choice.id)
-        await add_role(ctx, user, 3)
+        await add_role(ctx, user, 2)
         await assigner_membre_fct(ctx, user)
         text = text + "<@" + str(user.id) + ">" + " "
         i = i + 1
@@ -298,7 +302,7 @@ async def kill(ctx, user: discord.User):
     with open("vars.json", "r") as f:
         vars = json.load(f)
     role = vars[str(member.id)]["role"]
-    while role > 1:
+    while role >= 1:
         await add_role(guild, member, -1)
         role = role - 1
 
@@ -314,7 +318,7 @@ async def mute(ctx, setting):
 
 
 @bot.command(name='sondage')
-async def sondage(ctx, x, y):
+async def sondage(ctx, x, y, day):
     liste = await liste_id_villageois(ctx)
     liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
     nb = await count_villageois(ctx)
@@ -337,7 +341,10 @@ async def sondage(ctx, x, y):
     while i != len(liste):
         await msg.add_reaction(liste_emoji[i])
         i += 1
-    await nuit_un_timer(ctx, int(x), int(y), msg)
+    if day == "nuit":
+        await nuit_un_timer(ctx, int(x), int(y), msg)
+    if day == "jour":
+        await jour_timer(ctx, int(x), int(y), msg)
 
 
 # A partir d'ici se sont les fonctions appeler par le bot
@@ -345,6 +352,34 @@ async def nuit_un_timer(ctx, time: int, count: int, msg):
     l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
     l.after_loop(nuit_un_end_loop(ctx, msg))
     l.start(l)
+
+
+async def jour_timer(ctx, time: int, count: int, msg):
+    l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
+    l.after_loop(jour_end_loop(ctx, msg))
+    l.start(l)
+
+
+def jour_end_loop(ctx, msg):
+    async def coro():
+        guild = ctx.guild
+        liste = await liste_id_villageois(ctx)
+        await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique !")
+        channel_village = discord.utils.get(guild.text_channels, name='village')
+        x, pos = await count_react(ctx, msg)
+        await channel_village.send("Le Village a fait son choix")
+        if x >= 1:
+            await channel_village.send("Il y a une égalité et personne ne meurt")
+        else:
+            await kill(ctx, liste[pos])
+            await channel_village.send(f"{liste[pos].mention} est mort".format(ctx))
+        x = await check_fin(ctx)
+        if x == 1:
+            await channel_village.send("La partie est terminer")
+            return -1
+        else:
+            await channel_village.send("Le village s'endort")
+    return coro
 
 
 @bot.command(name="tiiime")
@@ -360,13 +395,14 @@ async def timer_invisible(ctx, time: int, count: int, msg):
 
 def loop_invisible(ctx):
     async def coro(l: tasks.Loop):
-        print("un")
+        x = 0
     return coro
 
 
 def end_loop_invisible(ctx, msg):
     async def coro():
-        print("deux")
+        channel = discord.utils.get(ctx.guild.text_channels, name='village')
+        await sondage(channel, 10, 3, "jour")
     return coro
 
 
@@ -396,8 +432,8 @@ def nuit_un_end_loop(ctx, msg):
             await channel_village.send("La partie est terminer")
             return -1
         else:
-            print("await suite game")
-
+            await channel_village.send("Le village commence a débattre")
+            await timer_invisible(ctx, 10, 3, "fin nuit")
     return coro
 
 
@@ -580,7 +616,7 @@ async def nuit_un(ctx):
     await channel_village.send("C’est la nuit, tout le village s’endort, les joueurs ferment leurs micros")
     await channel_village.send("Les Loups-Garous se réveillent, se reconnaissent et désignent une nouvelle victime !!!")
     await channel_lg.send("C'est le moment de voter")
-    await sondage(channel_lg, 10, 3)
+    await sondage(channel_lg, 10, 3, "nuit")
 
 
 async def add_xp2(ctx: commands.Context, user: discord.User, p):
@@ -617,8 +653,8 @@ async def check_fin(ctx):
             vars = json.load(f)
         role = vars[str(liste[i].id)]["role"]
         if role == 3:
-            lg = lg+1
-        if role == 0:
+            lg = lg + 1
+        if role == 1:
             villageois = villageois + 1
         i = i + 1
     if lg > villageois:
