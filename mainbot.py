@@ -227,13 +227,12 @@ async def liste_villageois(ctx):
 async def choix_lg(ctx):
     i = 0
     liste = await liste_id_participant(ctx)
-    x=0
+    x = 0
     while x < len(liste):
         await add_role(ctx, liste[x], 1)
         x = x + 1
     random.shuffle(liste)
     channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
-    # pour deux loup-garou
     j = round(len(liste) / 5)
     text = "Les loup-garous sont: "
     if j == 0:
@@ -242,15 +241,28 @@ async def choix_lg(ctx):
         choice = liste.pop()
         user = bot.get_user(choice.id)
         await add_role(ctx, user, 2)
-        await assigner_membre_fct(ctx, user)
+        await assigner_lg(ctx, user)
         text = text + "<@" + str(user.id) + ">" + " "
         i = i + 1
     await channel.send(text.format(ctx))
+    channel = discord.utils.get(ctx.guild.text_channels, name='voyante')
+    choice = liste.pop()
+    user = bot.get_user(choice.id)
+    await add_role(ctx, user, 1)
+    await assigner_voyante(ctx, user)
+    text2 = "La voyante est : "
+    text2 = text2 + "<@" + str(user.id) + ">" + " "
+    await channel.send(text2.format(ctx))
     return liste
 
 
-async def assigner_membre_fct(ctx, user):
+async def assigner_lg(ctx, user):
     channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
+    await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
+
+
+async def assigner_voyante(ctx, user):
+    channel = discord.utils.get(ctx.guild.text_channels, name='voyante')
     await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
 
 
@@ -648,7 +660,6 @@ async def add_points(users, user, p):
     users[f"{user.id}"]["points"] += p
 
 
-@bot.command(name="check_fin")
 async def check_fin(ctx):
     liste = await liste_id_participant(ctx)
     channel_village = discord.utils.get(ctx.guild.text_channels, name='village')
@@ -662,7 +673,7 @@ async def check_fin(ctx):
         role = vars[str(liste[i].id)]["role"]
         if role == 3:
             lg = lg + 1
-        if role == 1:
+        if role == 1 or role == 2:
             villageois = villageois + 1
         i = i + 1
     if lg > villageois:
