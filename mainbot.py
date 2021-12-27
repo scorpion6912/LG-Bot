@@ -228,6 +228,7 @@ async def choix_lg(ctx):
     i = 0
     liste = await liste_id_participant(ctx)
     x = 0
+    participant = len(liste)
     while x < len(liste):
         await add_role(ctx, liste[x], 1)
         x = x + 1
@@ -253,6 +254,9 @@ async def choix_lg(ctx):
     text2 = "La voyante est : "
     text2 = text2 + "<@" + str(user.id) + ">" + " "
     await channel.send(text2.format(ctx))
+    channel = discord.utils.get(ctx.guild.text_channels, name='village')
+    villageois = participant - i - 1
+    await channel.send("Il y a " + str(villageois) + " villageois, " + str(i) + " loup garou et une voyante")
     return liste
 
 
