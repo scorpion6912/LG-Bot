@@ -378,7 +378,10 @@ def jour_end_loop(ctx, msg):
             await channel_village.send("La partie est terminer")
             return -1
         else:
-            await channel_village.send("Le village s'endort")
+            channel_lg = discord.utils.get(guild.text_channels, name='loup-garou')
+            await channel_village.send("C’est la nuit, tout le village s’endort, les joueurs ferment leurs micros")
+            await channel_village.send("Les Loups-Garous se réveillent, se reconnaissent et désignent une nouvelle victime !!!")
+            await sondage(channel_lg, 10, 3, "nuit")
     return coro
 
 
@@ -402,6 +405,7 @@ def loop_invisible(ctx):
 def end_loop_invisible(ctx, msg):
     async def coro():
         channel = discord.utils.get(ctx.guild.text_channels, name='village')
+        await channel.send("C'est le moment de voter")
         await sondage(channel, 10, 3, "jour")
     return coro
 
