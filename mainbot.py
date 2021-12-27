@@ -307,7 +307,6 @@ async def kill(ctx, user: discord.User):
         role = role - 1
 
 
-@bot.command(name="mute")
 async def mute(ctx, setting):
     voice_channel = discord.utils.get(ctx.guild.channels, name="Village_vocal")
     for member in voice_channel.members:
@@ -380,6 +379,8 @@ def jour_end_loop(ctx, msg):
         else:
             channel_lg = discord.utils.get(guild.text_channels, name='loup-garou')
             await channel_village.send("C’est la nuit, tout le village s’endort, les joueurs ferment leurs micros")
+            voice_channel = discord.utils.get(ctx.guild.channels, name="Village_vocal")
+            await mute(voice_channel, "true")
             await channel_village.send("Les Loups-Garous se réveillent, se reconnaissent et désignent une nouvelle victime !!!")
             await sondage(channel_lg, 10, 3, "nuit")
     return coro
@@ -426,6 +427,8 @@ def nuit_un_end_loop(ctx, msg):
         x, pos = await count_react(ctx, msg)
         await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
         await channel_village.send("Le Village ce réveille et apprend que durant la nuit:")
+        voice_channel = discord.utils.get(ctx.guild.channels, name="Village_vocal")
+        await mute(voice_channel, "false")
         if x >= 1:
             await channel_village.send("Il y a une égalité et personne ne meurt")
         else:
@@ -618,6 +621,7 @@ async def nuit_un(ctx):
                                "contraire "
                                "tenterez-vous de le précipiter dans la mort ?")
     await channel_village.send("C’est la nuit, tout le village s’endort, les joueurs ferment leurs micros")
+    await mute(channel_vocal, "true")
     await channel_village.send("Les Loups-Garous se réveillent, se reconnaissent et désignent une nouvelle victime !!!")
     await channel_lg.send("C'est le moment de voter")
     await sondage(channel_lg, 10, 3, "nuit")
