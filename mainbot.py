@@ -551,6 +551,7 @@ async def count_react(ctx, msg):
             j = lst[i]
             x = 0
         i = i + 1
+    await msg.delete()
     return x, pos
 
 
