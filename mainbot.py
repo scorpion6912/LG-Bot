@@ -322,9 +322,15 @@ async def kill(ctx, user: discord.User):
     if role == 3:
         channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
         await channel.set_permissions(user, read_messages=True, send_messages=False, view_channel=True)
+        role2 = "loup garou"
+    if role == 2:
+        role2 = "voyante"
+    if role == 1:
+        role2 = "villageois"
     while role >= 1:
         await add_role(guild, member, -1)
         role = role - 1
+    return role2
 
 
 async def check_role(ctx, user: discord.User):
@@ -427,8 +433,8 @@ def jour_end_loop(ctx, msg):
         if x >= 1:
             await channel_village.send("Il y a une égalité et personne ne meurt")
         else:
-            await kill(ctx, liste[pos])
-            await channel_village.send(f"{liste[pos].mention} est mort".format(ctx))
+            role = await kill(ctx, liste[pos])
+            await channel_village.send(f"{liste[pos].mention} est mort, il était {role}".format(ctx))
         x = await check_fin(ctx)
         if x == 1:
             await channel_village.send("La partie est terminer")
@@ -507,8 +513,8 @@ def nuit_un_end_loop(ctx, msg):
         if x >= 1:
             await channel_village.send("Il y a une égalité et personne ne meurt")
         else:
-            await kill(ctx, liste[pos])
-            await channel_village.send(f"{liste[pos].mention} est mort".format(ctx))
+            role = await kill(ctx, liste[pos])
+            await channel_village.send(f"{liste[pos].mention} est mort, il était {role}".format(ctx))
         x = await check_fin(ctx)
         if x == 1:
             await channel_village.send("La partie est terminer")
