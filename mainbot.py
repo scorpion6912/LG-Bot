@@ -32,7 +32,8 @@ async def on_reaction_add(reaction, ctx):
         return
     channel = discord.utils.get(ctx.guild.text_channels, name='village')
     channel2 = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
-    if reaction.message.channel.id == channel.id or reaction.message.channel.id == channel2.id:
+    channel3 = discord.utils.get(ctx.guild.text_channels, name='voyante')
+    if reaction.message.channel.id == channel.id or reaction.message.channel.id == channel2.id or reaction.message.channel.id == channel3.id:
         chan = bot.get_channel(reaction.message.channel.id)
     else:
         return
@@ -117,7 +118,8 @@ async def on_raw_reaction_remove(payload):
     member = await bot.get_guild(payload.guild_id).fetch_member(payload.user_id)
     channel = discord.utils.get(guild.text_channels, name='village')
     channel2 = discord.utils.get(guild.text_channels, name='loup-garou')
-    if payload.channel_id == channel.id or payload.channel_id == channel2.id:
+    channel3 = discord.utils.get(guild.text_channels, name='voyante')
+    if payload.channel_id == channel.id or payload.channel_id == channel2.id or payload.channel_id == channel3.id:
         role = discord.utils.get(guild.roles, name='Villageois')
         chan = bot.get_channel(payload.channel_id)
         msg = await chan.fetch_message(payload.message_id)
