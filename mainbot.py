@@ -325,8 +325,9 @@ async def classement(ctx):
 
     names = ''
     for postion, user in enumerate(top_users):
-        names += f'{postion + 1} - <@!{user}> avec {top_users[user]["points"]} points \n'
-
+        userr = await bot.fetch_user(user)
+        if userr in ctx.guild.members:
+            names += f'{postion + 1} - <@!{user}> avec {top_users[user]["points"]} points \n'
     embed = discord.Embed(title=f'Classment dans le serveur: {ctx.guild.name}')
     embed.add_field(name="NOM", value=names, inline=False)
     await ctx.send(embed=embed)
