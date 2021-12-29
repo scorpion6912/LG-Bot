@@ -37,6 +37,10 @@ async def on_reaction_add(reaction, ctx):
         chan = bot.get_channel(reaction.message.channel.id)
     else:
         return
+    role = discord.utils.get(ctx.guild.roles, name="Mort")
+    if role in ctx.roles:
+        await reaction.message.remove_reaction(reaction.emoji, ctx)
+        return
     if reaction.emoji == "➕":
         role = discord.utils.get(ctx.guild.roles, name='Villageois')
         role2 = discord.utils.get(ctx.guild.roles, name='Participant')
@@ -628,9 +632,9 @@ async def botsetup(ctx):
             f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
             f"la partie")
         role = discord.utils.get(ctx.guild.roles, name="Participant")
-        await channel.set_permissions(role, read_messages=True, send_messages=False, view_channel=True)
+        await channel.set_permissions(role, read_messages=True, send_messages=False, view_channel=True, add_reactions=False)
         role = discord.utils.get(ctx.guild.roles, name="Villageois")
-        await channel.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
+        await channel.set_permissions(role, read_messages=True, send_messages=True, view_channel=True, add_reactions=True)
         await msg.add_reaction('➕')
         await msg.add_reaction('✅')
     else:
