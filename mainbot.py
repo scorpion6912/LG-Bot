@@ -104,11 +104,27 @@ async def add_rrole(vars, user, x):
     vars[f"{user.id}"]["role"] += x
 
 
+async def add_role2(ctx: commands.Context, user: discord.User, x):
+    with open("vars.json", "r") as f:
+        vars = json.load(f)
+
+    await update_var(vars, user)
+    await add_rrole2(vars, user, x)
+
+    with open("vars.json", "w") as f:
+        json.dump(vars, f)
+
+
+async def add_rrole2(vars, user, x):
+    vars[f"{user.id}"]["role2"] += x
+
+
 async def update_var(vars, user):
     if not f"{user.id}" in vars:
         vars[f"{user.id}"] = {}
         vars[f"{user.id}"]["vote"] = 0
         vars[f"{user.id}"]["role"] = 0
+        vars[f"{user.id}"]["role2"] = 0
 
 
 async def add_varr(vars, user, x):
@@ -237,6 +253,7 @@ async def choix_lg(ctx):
     participant = len(liste)
     while x < len(liste):
         await add_role(ctx, liste[x], 1)
+        await add_role2(ctx, liste[x], 1)
         x = x + 1
     random.shuffle(liste)
     channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
@@ -248,6 +265,7 @@ async def choix_lg(ctx):
         choice = liste.pop()
         user = bot.get_user(choice.id)
         await add_role(ctx, user, 2)
+        await add_role2(ctx, user, 2)
         await assigner_lg(ctx, user)
         text = text + "<@" + str(user.id) + ">" + " "
         i = i + 1
@@ -256,6 +274,7 @@ async def choix_lg(ctx):
     choice = liste.pop()
     user = bot.get_user(choice.id)
     await add_role(ctx, user, 1)
+    await add_role2(ctx, user, 1)
     await assigner_voyante(ctx, user)
     text2 = "La voyante est : "
     text2 = text2 + "<@" + str(user.id) + ">" + " "
@@ -689,6 +708,10 @@ async def nuit_un(ctx):
         while role > 0:
             await add_role(guild, liste[i], -1)
             role = role - 1
+        role2 = vars[str(liste[i].id)]["role2"]
+        while role2 > 0:
+            await add_role2(guild, liste[i], -1)
+            role2 = role2 - 1
         i += 1
     await choix_lg(channel_village)
     await channel_village.send("Il fait sombre, la lumière de la lune traverse à peine les nuages pour révéler le "
@@ -751,9 +774,29 @@ async def check_fin(ctx):
             villageois = villageois + 1
         i = i + 1
     if lg > villageois:
+        x = 0
+        while x < len(liste):
+            with open("vars.json", "r") as f:
+                vars = json.load(f)
+            role2 = vars[str(liste[x].id)]["role2"]
+            if role2 == 3:
+                await add_xp2(ctx, liste[x], 3)
+            else:
+                await add_xp2(ctx, liste[x], 1)
+            x = x + 1
         await channel_village.send("Les loup garous ont gagné")
         return 1
     if lg == 0:
+        x = 0
+        while x < len(liste):
+            with open("vars.json", "r") as f:
+                vars = json.load(f)
+            role2 = vars[str(liste[x].id)]["role2"]
+            if role2 == 3:
+                await add_xp2(ctx, liste[x], 1)
+            else:
+                await add_xp2(ctx, liste[x], 3)
+            x = x + 1
         await channel_village.send("Les villageois ont gagné")
         return 1
     if villageois >= lg:
