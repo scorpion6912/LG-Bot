@@ -190,10 +190,31 @@ async def aled(ctx):
     await ctx.author.send("!aled pour avoir la liste des commandes".format(ctx))
 
 
-# Message privé une personne
-@bot.command(name="mp")
-async def download(message):
-    await message.author.send('👀')
+# Message privé des rôles
+@bot.command(name="roles")
+async def roles(message):
+    await message.author.send("Loup-Garou:\n"
+                              "Vaincre les villageois est son objectif. Durant la nuit les loups-garous se réunissent "
+                              "pour voter qui va être éliminé. Pendant la journée il ne doit pas être démasqué.\n "
+                              "• Le Loup-Garou est appelé une fois par nuit. Il peut discuter avec les autres loups "
+                              "durant leur phase de vote.\n "
+                              "• Si le vote mène sur une égalité ou si les Loups ne ciblent personne"
+                              "Aucun joueur ne meurt\n\n"
+                              "Simple Villageois:\n"
+                              "Vaincre les loups-garous est son objectif. Sa parole est son seul pouvoir de "
+                              "persuasion pour les éliminer. Restez à l'affût d'indice, et identifiez les "
+                              "coupables.\n"
+                              "• En cas d'égalité lors du vote journalier et si aucun maire n'est élu, aucun joueur "
+                              "ne meurt.\n "
+                              "• Les votes des Simples Villageois peuvent être décisifs dans la lutte contre les "
+                              "Loups-Garous.\n\n"
+                              "Voyante:\n"
+                              "Vaincre les loups-garous est son objectif. Chaque nuit elle peut connaître le rôle "
+                              "d'un joueur qu'elle aura choisi. Elle doit aider les villageois sans se faire "
+                              "démasquer.\n"
+                              "• Utilise ton pouvoir chaque nuit en cliquant sur le joueur de ton choix pour "
+                              "connaître son rôle.\n"
+                              "• Copier le texte indiquant le rôle du joueur observé est considéré comme anti-jeu.\n\n")
 
 
 # Commande pour effacer des messages dans un channel
@@ -295,7 +316,6 @@ async def assigner_voyante(ctx, user):
     await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
 
 
-@bot.command(name="add_xp")
 async def add_xp(ctx: commands.Context, user: discord.User, p):
     await add_xp2(ctx, user, p)
 
