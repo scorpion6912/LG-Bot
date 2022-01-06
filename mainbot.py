@@ -188,6 +188,7 @@ async def aled(ctx):
     await ctx.author.send("!setup permet de créer les channels ".format(ctx))
     await ctx.author.send("!desetup permet de supprimer les channels créer par le bot".format(ctx))
     await ctx.author.send("!aled pour avoir la liste des commandes".format(ctx))
+    await ctx.author.send("!roles pour avoir la description des roles".format(ctx))
 
 
 # Message privé des rôles
