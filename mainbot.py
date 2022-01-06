@@ -160,13 +160,6 @@ async def on_raw_reaction_remove(payload):
         return
 
 
-# Bot commande:
-@bot.command(name="test")
-async def test(ctx):
-    channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
-    await channel.set_permissions(ctx.author, read_messages=True, send_messages=True, view_channel=True)
-
-
 # Création d'un salon textuel
 @bot.command(name="setup")
 async def setup(ctx):
@@ -227,23 +220,10 @@ async def delete(ctx, number: int):
         await each_message.delete()
 
 
-# Commande bonjour
-@bot.command(name='bonjour')
-async def bonjour(ctx):
-    await ctx.channel.send('Bonjour {0.author.mention} !'.format(ctx))
-
-
 # Ping (pong)
 @bot.command(name='ping')
 async def ping(ctx):
     await ctx.send(f'Pong! {round(bot.latency * 1000)}ms')
-
-
-# Embed pour que ce soit plus joli
-@bot.command(name='oui')
-async def oui(ctx):
-    embed = discord.Embed(title="foo", description="bar", color=0xFF0000)
-    await ctx.send(embed=embed)
 
 
 # Connexion dans salon vocal
