@@ -383,6 +383,7 @@ async def mute(ctx, setting):
 
 
 async def sondage(ctx, x, y, day):
+    global msg_cim
     liste = await liste_id_villageois(ctx)
     liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
     nb = await count_villageois(ctx)
@@ -407,12 +408,12 @@ async def sondage(ctx, x, y, day):
         i += 1
     if day == "nuit":
         await nuit_un_timer(ctx, int(x), int(y), msg)
+    if day == "cimetiere":
+        msg_cim = await cimetiere_timer(ctx, int(x), int(y), msg)
     if day == "jour":
-        await jour_timer(ctx, int(x), int(y), msg)
+        await jour_timer(ctx, int(x), int(y), msg, msg_cim)
     if day == "voyante":
         await voyante_timer(ctx, int(x), int(y), msg)
-    if day == "cimetiere":
-        await cimetiere_timer(ctx, int(x), int(y), msg)
 
 
 # A partir d'ici se sont les fonctions appeler par le bot
@@ -432,6 +433,7 @@ async def cimetiere_timer(ctx, time: int, count: int, msg):
     l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
     l.after_loop(cimetiere_end_loop(ctx, msg))
     l.start(l)
+    return msg
 
 
 def cimetiere_end_loop(ctx, msg):
@@ -460,13 +462,13 @@ def voyante_end_loop(ctx, msg):
     return coro
 
 
-async def jour_timer(ctx, time: int, count: int, msg):
+async def jour_timer(ctx, time: int, count: int, msg, msg_cim):
     l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
-    l.after_loop(jour_end_loop(ctx, msg))
+    l.after_loop(jour_end_loop(ctx, msg, msg_cim))
     l.start(l)
 
 
-def jour_end_loop(ctx, msg):
+def jour_end_loop(ctx, msg, msg_cim):
     async def coro():
         guild = ctx.guild
         liste = await liste_id_villageois(ctx)
@@ -481,15 +483,10 @@ def jour_end_loop(ctx, msg):
             await cimetiere.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
         else:
             role = await kill(ctx, liste[pos])
-            print("1")
             cimetiere = discord.utils.get(guild.text_channels, name='cimetiere')
-            print("5")
             role2 = discord.utils.get(ctx.guild.roles, name='Mort')
-            print("4")
             await cimetiere.set_permissions(role2, read_messages=True, send_messages=True, view_channel=True)
-            print("3")
-            await verif_cimetiere(ctx, liste[pos])
-            print("2")
+            await verif_cimetiere(ctx, liste[pos], msg_cim)
             await channel_village.send(f"{liste[pos].mention} est mort, il était {role}".format(ctx))
         x = await check_fin(ctx)
         if x == 1:
@@ -557,14 +554,11 @@ def loop(ctx):
     return coro
 
 
-async def verif_cimetiere(ctx, x):
+async def verif_cimetiere(ctx, mort, msg):
     guild = ctx.guild
     cimetiere = discord.utils.get(guild.text_channels, name='cimetiere')
-    msg = discord.utils.get(await cimetiere.history(limit=100).flatten())
-    while "Faite le bon choix" not in msg.content:
-        await msg.delete()
-        msg = discord.utils.get(await cimetiere.history(limit=100).flatten())
-
+    print(mort)
+    print(msg)
 
 
 def nuit_un_end_loop(ctx, msg):
