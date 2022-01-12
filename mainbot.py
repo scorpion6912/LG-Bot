@@ -558,7 +558,6 @@ async def verif_cimetiere(ctx, mort, msg):
     guild = ctx.guild
     cimetiere = discord.utils.get(guild.text_channels, name='cimetiere')
     print(mort)
-    print(msg)
 
 
 def nuit_un_end_loop(ctx, msg):
