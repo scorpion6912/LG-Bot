@@ -46,7 +46,7 @@ async def on_reaction_add(reaction, ctx):
         role2 = discord.utils.get(ctx.guild.roles, name='Participant')
         msg = await channel.fetch_message(reaction.message.id)
         if msg.content == (
-                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour "
+                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer, puis ✅ pour"
                 f"lancer "
                 f"la partie"):
             await ctx.add_roles(role)
@@ -61,7 +61,7 @@ async def on_reaction_add(reaction, ctx):
         role = discord.utils.get(ctx.guild.roles, name='Villageois')
         await channel.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
         if await count_villageois(ctx) < 2:
-            await channel.send("impossible de lancer a moins de 4")
+            await channel.send("impossible de lancer à moins de 4")
             await botdesetup(ctx)
             await botsetup(ctx)
             return
@@ -74,7 +74,7 @@ async def on_reaction_add(reaction, ctx):
         vote = vars[str(ctx.id)]["vote"]
         if vote > 0:
             await reaction.message.remove_reaction(reaction.emoji, ctx)
-            await chan.send("Il n'est pas possible de voter pour deux personne différente")
+            await chan.send("Il n'est pas possible de voter pour deux personnes différentes")
             await add_var(ctx, ctx, 1)
 
 
@@ -144,7 +144,7 @@ async def on_raw_reaction_remove(payload):
         chan = bot.get_channel(payload.channel_id)
         msg = await chan.fetch_message(payload.message_id)
         if msg.content == (
-                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
+                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis, ✅ pour lancer "
                 f"la partie"):
             await member.remove_roles(role)
             await channel.send(f"{member.mention} est désinscrit".format(member))
@@ -175,13 +175,13 @@ async def desetup(ctx):
 # Affichage des commandes
 @bot.command(name="aled")
 async def aled(ctx):
-    embed = discord.Embed(title="tu as demande de l'aide ?", description="regarde tes mps 😉", color=0xFF0000)
+    embed = discord.Embed(title="as-tu besoin d'aide ?", description="regarde tes mps 😉", color=0xFF0000)
     await ctx.send(embed=embed)
-    await ctx.author.send("voici les commandes que tu peux utiliser".format(ctx))
-    await ctx.author.send("!setup permet de créer les channels ".format(ctx))
-    await ctx.author.send("!desetup permet de supprimer les channels créer par le bot".format(ctx))
-    await ctx.author.send("!aled pour avoir la liste des commandes".format(ctx))
-    await ctx.author.send("!roles pour avoir la description des roles".format(ctx))
+    await ctx.author.send("voici les commandes que tu peux utiliser :".format(ctx))
+    await ctx.author.send("- `!setup` permet de créer les channels".format(ctx))
+    await ctx.author.send("- `!desetup` permet de supprimer les channels créé par le bot".format(ctx))
+    await ctx.author.send("- `!aled` pour avoir la liste des commandes".format(ctx))
+    await ctx.author.send("- `!roles` pour avoir la description des rôles".format(ctx))
 
 
 # Message privé des rôles
@@ -329,7 +329,7 @@ async def classement(ctx):
         userr = await bot.fetch_user(user)
         if userr in ctx.guild.members:
             names += f'{postion + 1} - <@!{user}> avec {top_users[user]["points"]} points \n'
-    embed = discord.Embed(title=f'Classment dans le serveur: {ctx.guild.name}')
+    embed = discord.Embed(title=f'Classement dans le serveur: {ctx.guild.name}')
     embed.add_field(name="NOM", value=names, inline=False)
     await ctx.send(embed=embed)
 
@@ -366,11 +366,11 @@ async def check_role(ctx, user: discord.User):
     role = vars[str(member.id)]["role"]
     channel = discord.utils.get(ctx.guild.text_channels, name='voyante')
     if role == 1:
-        await channel.send(member.name + " est villageois")
+        await channel.send(member.name + " est villageois 🧍")
     if role == 2:
-        await channel.send(member.name + " est voyante")
+        await channel.send(member.name + " est voyante👀")
     if role == 3:
-        await channel.send(member.name + " est loup garou")
+        await channel.send(member.name + " est loup garou 🐺")
 
 
 async def mute(ctx, setting):
@@ -400,7 +400,7 @@ async def sondage(ctx, x, y, day):
             await add_var(guild, liste[i], -1)
         text = text + liste[i].name + " " + liste_emoji[i] + "\n"
         i += 1
-    text = text + "Faite le bon choix"
+    text = text + "Faites le bon choix"
     msg = await ctx.send(text)
     i = 0
     while i != len(liste):
@@ -416,7 +416,8 @@ async def sondage(ctx, x, y, day):
         await voyante_timer(ctx, int(x), int(y), msg)
 
 
-# A partir d'ici se sont les fonctions appeler par le bot
+#-- A partir d'ici ce sont les fonctions appeler par le bot --
+
 async def nuit_un_timer(ctx, time: int, count: int, msg):
     l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
     l.after_loop(nuit_un_end_loop(ctx, msg))
@@ -454,8 +455,8 @@ def voyante_end_loop(ctx, msg):
         x, pos = await count_react(ctx, msg)
         channel_voyante = discord.utils.get(ctx.guild.text_channels, name='voyante')
         await check_role(channel_voyante, liste[pos])
-        await channel_village.send("La voyante se rendort apres avoir decouvert le role d'un joueur")
-        await channel_village.send("Les Loups-Garous se réveillent, se reconnaissent et désignent une nouvelle victime !!!")
+        await channel_village.send("La voyante se rendort après avoir decouvert le role d'un joueur👀")
+        await channel_village.send("Les Loups-Garous se réveillent, se reconnaissent et désignent une victime !🐺")
         channel_lg = discord.utils.get(guild.text_channels, name='loup-garou')
         await sondage(channel_lg, 10, 3, "nuit")
         cimetiere = discord.utils.get(guild.text_channels, name='cimetiere')
@@ -473,12 +474,12 @@ def jour_end_loop(ctx, msg, msg_cim, liste_cim):
     async def coro():
         guild = ctx.guild
         liste = await liste_id_villageois(ctx)
-        await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique !")
+        await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique ! ✨")
         channel_village = discord.utils.get(guild.text_channels, name='village')
         x, pos = await count_react(ctx, msg)
-        await channel_village.send("Le Village a fait son choix")
+        await channel_village.send("Le Village a fait son choix 🪓")
         if x >= 1:
-            await channel_village.send("Il y a une égalité et personne ne meurt")
+            await channel_village.send("Il y a une égalité et personne ne meurt 🤔")
             cimetiere = discord.utils.get(guild.text_channels, name='cimetiere')
             role = discord.utils.get(ctx.guild.roles, name='Mort')
             await cimetiere.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
@@ -491,10 +492,10 @@ def jour_end_loop(ctx, msg, msg_cim, liste_cim):
             await channel_village.send(f"{liste[pos].mention} est mort, il était {role}".format(ctx))
         x = await check_fin(ctx)
         if x == 1:
-            await channel_village.send("La partie est terminer")
+            await channel_village.send("La partie est terminée")
             return -1
         else:
-            await channel_village.send("C’est la nuit, tout le village s’endort, les joueurs ferment leurs micros")
+            await channel_village.send("C’est la nuit, tout le village s’endort, les joueurs ferment leurs micros 🎙️")
             voice_channel = discord.utils.get(ctx.guild.channels, name="Village_vocal")
             await mute(voice_channel, "true")
             liste = await liste_id_participant(ctx)
@@ -509,12 +510,12 @@ def jour_end_loop(ctx, msg, msg_cim, liste_cim):
                     voyante = 1
                 i = i + 1
             if voyante == 1:
-                await channel_village.send("La voyante se reveille pour decouvrit le role d'un joueur")
+                await channel_village.send("La voyante se reveille pour decouvrit le role d'un joueur 👀")
                 channel_voyante = discord.utils.get(guild.text_channels, name='voyante')
                 await sondage(channel_voyante, 5, 3, "voyante")
             else:
                 await channel_village.send(
-                    "Les Loups-Garous se réveillent, se reconnaissent et désignent une nouvelle victime !!!")
+                    "Les Loups-Garous se réveillent, se reconnaissent et désignent une nouvelle victime !!! 🐺")
                 channel_lg = discord.utils.get(guild.text_channels, name='loup-garou')
                 await sondage(channel_lg, 10, 3, "nuit")
                 cimetiere = discord.utils.get(guild.text_channels, name='cimetiere')
@@ -543,7 +544,7 @@ def loop_invisible(ctx):
 def end_loop_invisible(ctx, msg):
     async def coro():
         channel = discord.utils.get(ctx.guild.text_channels, name='village')
-        await channel.send("C'est le moment de voter")
+        await channel.send("C'est le moment de voter 📩")
         await sondage(channel, 10, 3, "jour")
     return coro
 
@@ -580,25 +581,25 @@ def nuit_un_end_loop(ctx, msg):
     async def coro():
         guild = ctx.guild
         liste = await liste_id_villageois(ctx)
-        await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique !")
+        await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique ! ✨")
         channel_village = discord.utils.get(guild.text_channels, name='village')
         x, pos = await count_react(ctx, msg)
-        await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses")
-        await channel_village.send("Le Village ce réveille et apprend que durant la nuit:")
+        await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses 🐺")
+        await channel_village.send("Le Village se réveille et apprend que durant la nuit 🌙:")
         voice_channel = discord.utils.get(ctx.guild.channels, name="Village_vocal")
         await mute(voice_channel, "false")
         if x >= 1:
-            await channel_village.send("Il y a une égalité et personne ne meurt")
+            await channel_village.send("Il y a une égalité et personne ne meurt :🤔")
         else:
             role = await kill(ctx, liste[pos])
             await channel_village.send(f"{liste[pos].mention} est mort, il était {role}".format(ctx))
         x = await check_fin(ctx)
         if x == 1:
-            await channel_village.send("La partie est terminer")
+            await channel_village.send("La partie est terminée")
             return -1
         else:
-            await channel_village.send("Le village commence a débattre")
-            await timer_invisible(channel_village, 10, 3, "fin nuit")
+            await channel_village.send("Le village commence a débattre 📩")
+            await timer_invisible(channel_village, 10, 3, "fin nuit 🌙")
     return coro
 
 
