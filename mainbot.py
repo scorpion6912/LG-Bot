@@ -67,7 +67,7 @@ async def on_reaction_add(reaction, ctx):
             return
         await liste_villageois(ctx)
         await nuit_un(ctx)
-    if "Faite le bon choix" in reaction.message.content:
+    if "Faites le bon choix" in reaction.message.content:
         with open("vars.json", "r") as f:
             vars = json.load(f)
         await add_var(ctx, ctx, 1)
@@ -144,11 +144,12 @@ async def on_raw_reaction_remove(payload):
         chan = bot.get_channel(payload.channel_id)
         msg = await chan.fetch_message(payload.message_id)
         if msg.content == (
-                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis, ✅ pour lancer "
+                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer, puis ✅ pour"
+                f"lancer "
                 f"la partie"):
             await member.remove_roles(role)
             await channel.send(f"{member.mention} est désinscrit".format(member))
-        if "Faite le bon choix" in msg.content:
+        if "Faites le bon choix" in msg.content:
             # await var_add(guild, member)
             await add_var(guild, member, -2)
             with open("vars.json", "r") as f:
@@ -703,7 +704,8 @@ async def botsetup(ctx):
     if channel is None:
         channel = await guild.create_text_channel('village')
         msg = await channel.send(
-            f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer puis ✅ pour lancer "
+            f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer, puis ✅ pour"
+            f"lancer "
             f"la partie")
         role = discord.utils.get(ctx.guild.roles, name="Participant")
         await channel.set_permissions(role, read_messages=True, send_messages=False, view_channel=True, add_reactions=False)
