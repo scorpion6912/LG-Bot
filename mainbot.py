@@ -383,7 +383,7 @@ async def mute(ctx, setting):
 
 
 async def sondage(ctx, x, y, day):
-    global msg_cim
+    global msg_cim, liste_cim
     liste = await liste_id_villageois(ctx)
     liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
     nb = await count_villageois(ctx)
@@ -409,9 +409,9 @@ async def sondage(ctx, x, y, day):
     if day == "nuit":
         await nuit_un_timer(ctx, int(x), int(y), msg)
     if day == "cimetiere":
-        msg_cim = await cimetiere_timer(ctx, int(x), int(y), msg)
+        msg_cim, liste_cim = await cimetiere_timer(ctx, int(x), int(y), msg)
     if day == "jour":
-        await jour_timer(ctx, int(x), int(y), msg, msg_cim)
+        await jour_timer(ctx, int(x), int(y), msg, msg_cim, liste_cim)
     if day == "voyante":
         await voyante_timer(ctx, int(x), int(y), msg)
 
@@ -433,7 +433,8 @@ async def cimetiere_timer(ctx, time: int, count: int, msg):
     l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
     l.after_loop(cimetiere_end_loop(ctx, msg))
     l.start(l)
-    return msg
+    liste = await liste_id_villageois(ctx)
+    return msg, liste
 
 
 def cimetiere_end_loop(ctx, msg):
@@ -462,13 +463,13 @@ def voyante_end_loop(ctx, msg):
     return coro
 
 
-async def jour_timer(ctx, time: int, count: int, msg, msg_cim):
+async def jour_timer(ctx, time: int, count: int, msg, msg_cim, liste_cim):
     l = tasks.Loop(loop(ctx), time, 0, 0, count, True, None)
-    l.after_loop(jour_end_loop(ctx, msg, msg_cim))
+    l.after_loop(jour_end_loop(ctx, msg, msg_cim, liste_cim))
     l.start(l)
 
 
-def jour_end_loop(ctx, msg, msg_cim):
+def jour_end_loop(ctx, msg, msg_cim, liste_cim):
     async def coro():
         guild = ctx.guild
         liste = await liste_id_villageois(ctx)
@@ -486,7 +487,7 @@ def jour_end_loop(ctx, msg, msg_cim):
             cimetiere = discord.utils.get(guild.text_channels, name='cimetiere')
             role2 = discord.utils.get(ctx.guild.roles, name='Mort')
             await cimetiere.set_permissions(role2, read_messages=True, send_messages=True, view_channel=True)
-            await verif_cimetiere(ctx, liste[pos], msg_cim)
+            await verif_cimetiere(ctx, liste[pos], msg_cim, liste_cim)
             await channel_village.send(f"{liste[pos].mention} est mort, il était {role}".format(ctx))
         x = await check_fin(ctx)
         if x == 1:
@@ -554,10 +555,25 @@ def loop(ctx):
     return coro
 
 
-async def verif_cimetiere(ctx, mort, msg):
+async def verif_cimetiere(ctx, mort, msg, liste_cim):
     guild = ctx.guild
     cimetiere = discord.utils.get(guild.text_channels, name='cimetiere')
-    print(mort)
+    i = 0
+    while liste_cim[i] != mort:
+        i = i + 1
+    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+    emojii = liste_emoji[i]
+    m = await cimetiere.fetch_message(msg.id)
+    react = discord.utils.get(m.reactions, emoji=emojii)
+    users = await react.users().flatten()
+    text = ""
+    for user in users:
+        if user != bot.user:
+            await add_xp2(ctx, user, 1)
+            text = text + user.name + " "
+    text = text + " ont gagné de l'xp"
+    await cimetiere.send(text)
+    await msg.delete()
 
 
 def nuit_un_end_loop(ctx, msg):
@@ -818,9 +834,9 @@ async def check_fin(ctx):
                 vars = json.load(f)
             role2 = vars[str(liste[x].id)]["role2"]
             if role2 == 3:
-                await add_xp2(ctx, liste[x], 3)
+                await add_xp2(ctx, liste[x], 6)
             else:
-                await add_xp2(ctx, liste[x], 1)
+                await add_xp2(ctx, liste[x], 2)
             x = x + 1
         await channel_village.send("Les loup garous ont gagné")
         return 1
@@ -831,9 +847,9 @@ async def check_fin(ctx):
                 vars = json.load(f)
             role2 = vars[str(liste[x].id)]["role2"]
             if role2 == 3:
-                await add_xp2(ctx, liste[x], 1)
+                await add_xp2(ctx, liste[x], 2)
             else:
-                await add_xp2(ctx, liste[x], 3)
+                await add_xp2(ctx, liste[x], 6)
             x = x + 1
         await channel_village.send("Les villageois ont gagné")
         return 1
