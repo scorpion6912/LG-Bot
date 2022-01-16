@@ -848,9 +848,11 @@ async def check_fin(ctx):
                 vars = json.load(f)
             role2 = vars[str(liste[x].id)]["role2"]
             if role2 == 3:
-                await add_xp2(ctx, liste[x], 6)
+                if liste[x].id != bot.user.id:
+                    await add_xp2(ctx, liste[x], 6)
             else:
-                await add_xp2(ctx, liste[x], 2)
+                if liste[x].id != bot.user.id:
+                    await add_xp2(ctx, liste[x], 2)
             x = x + 1
         await channel_village.send("Les loup garous ont gagné")
         return 1
@@ -861,9 +863,11 @@ async def check_fin(ctx):
                 vars = json.load(f)
             role2 = vars[str(liste[x].id)]["role2"]
             if role2 == 3:
-                await add_xp2(ctx, liste[x], 2)
+                if liste[x].id != bot.user.id:
+                    await add_xp2(ctx, liste[x], 2)
             else:
-                await add_xp2(ctx, liste[x], 6)
+                if liste[x].id != bot.user.id:
+                    await add_xp2(ctx, liste[x], 6)
             x = x + 1
         await channel_village.send("Les villageois ont gagné")
         return 1
