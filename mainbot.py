@@ -376,11 +376,19 @@ async def check_role(ctx, user: discord.User):
 
 async def mute(ctx, setting):
     voice_channel = discord.utils.get(ctx.guild.channels, name="Village_vocal")
+    role = discord.utils.get(ctx.guild.roles, name='Mort')
     for member in voice_channel.members:
         if setting.lower() == 'true':
             await member.edit(mute=True)
         elif setting.lower() == 'false':
-            await member.edit(mute=False)
+            if role not in member.roles:
+                await member.edit(mute=False)
+
+
+async def unmute_all(ctx):
+    voice_channel = discord.utils.get(ctx.guild.channels, name="Village_vocal")
+    for member in voice_channel.members:
+        await member.edit(mute=False)
 
 
 async def sondage(ctx, x, y, day):
@@ -493,6 +501,7 @@ def jour_end_loop(ctx, msg, msg_cim, liste_cim):
             await channel_village.send(f"{liste[pos].mention} est mort, il était {role}".format(ctx))
         x = await check_fin(ctx)
         if x == 1:
+            await unmute_all(ctx)
             await channel_village.send("La partie est terminée")
             return -1
         else:
@@ -588,14 +597,16 @@ def nuit_un_end_loop(ctx, msg):
         await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses 🐺")
         await channel_village.send("Le Village se réveille et apprend que durant la nuit 🌙:")
         voice_channel = discord.utils.get(ctx.guild.channels, name="Village_vocal")
-        await mute(voice_channel, "false")
         if x >= 1:
             await channel_village.send("Il y a une égalité et personne ne meurt :🤔")
+            await mute(voice_channel, "false")
         else:
             role = await kill(ctx, liste[pos])
             await channel_village.send(f"{liste[pos].mention} est mort, il était {role}".format(ctx))
+            await mute(voice_channel, "false")
         x = await check_fin(ctx)
         if x == 1:
+            await unmute_all(ctx)
             await channel_village.send("La partie est terminée")
             return -1
         else:
