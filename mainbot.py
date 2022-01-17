@@ -485,6 +485,7 @@ def jour_end_loop(ctx, msg, msg_cim, liste_cim):
         liste = await liste_id_villageois(ctx)
         await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique ! ✨")
         channel_village = discord.utils.get(guild.text_channels, name='village')
+        await nom_react(ctx, msg)
         x, pos = await count_react(ctx, msg)
         await channel_village.send("Le Village a fait son choix 🪓")
         if x >= 1:
@@ -619,6 +620,28 @@ def nuit_un_end_loop(ctx, msg):
             await channel_village.send("Le village commence a débattre 📩")
             await timer_invisible(channel_village, 10, 3, "fin nuit 🌙")
     return coro
+
+
+async def nom_react(ctx, msg):
+    liste = await liste_id_villageois(ctx)
+    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+    v = 0
+    text = ""
+    channel = discord.utils.get(ctx.guild.text_channels, name='village')
+    while v < len(liste):
+        emojii = liste_emoji[v]
+        m = await ctx.fetch_message(msg.id)
+        react = discord.utils.get(m.reactions, emoji=emojii)
+        users = await react.users().flatten()
+        text = text + liste[v].name + " a été voté par : "
+        a = react.count
+        if a > 1:
+            for user in users:
+                if user != bot.user:
+                    text = text + user.name + " "
+            await channel.send(text)
+        text = " "
+        v = v + 1
 
 
 async def count_react(ctx, msg):
