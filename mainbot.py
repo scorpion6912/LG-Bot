@@ -555,7 +555,7 @@ def end_loop_invisible(ctx, msg):
     async def coro():
         channel = discord.utils.get(ctx.guild.text_channels, name='village')
         await channel.send("C'est le moment de voter 📩")
-        await sondage(channel, 10, 3, "jour")
+        await sondage(channel, 10, 6, "jour")
     return coro
 
 
