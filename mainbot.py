@@ -534,7 +534,6 @@ def jour_end_loop(ctx, msg, msg_cim, liste_cim):
     return coro
 
 
-@bot.command(name="tiiime")
 async def tiiime(ctx, x, y):
     await timer_invisible(ctx, int(x), int(y), None)
 
@@ -594,7 +593,8 @@ def nuit_un_end_loop(ctx, msg):
         await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique ! ✨")
         channel_village = discord.utils.get(guild.text_channels, name='village')
         x, pos = await count_react(ctx, msg)
-        await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses 🐺")
+        await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses "
+                                   "🐺")
         await channel_village.send("Le Village se réveille et apprend que durant la nuit 🌙:")
         voice_channel = discord.utils.get(ctx.guild.channels, name="Village_vocal")
         if x >= 1:
@@ -602,7 +602,7 @@ def nuit_un_end_loop(ctx, msg):
             await mute(voice_channel, "false")
         else:
             role = await kill(ctx, liste[pos])
-            await channel_village.send(f"{liste[pos].mention} est mort, il était {role}".format(ctx))
+            await channel_village.send(f"{liste[pos].mention} est mort, le rôle était {role}".format(ctx))
             await mute(voice_channel, "false")
         x = await check_fin(ctx)
         if x == 1:
