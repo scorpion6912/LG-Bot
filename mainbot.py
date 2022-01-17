@@ -506,6 +506,9 @@ def jour_end_loop(ctx, msg, msg_cim, liste_cim):
             return -1
         else:
             await channel_village.send("C’est la nuit, tout le village s’endort, les joueurs ferment leurs micros 🎙️")
+            channel = discord.utils.get(ctx.guild.text_channels, name='village')
+            role = discord.utils.get(ctx.guild.roles, name='Villageois')
+            await channel.set_permissions(role, read_messages=True, send_messages=False, view_channel=True)
             voice_channel = discord.utils.get(ctx.guild.channels, name="Village_vocal")
             await mute(voice_channel, "true")
             liste = await liste_id_participant(ctx)
@@ -596,6 +599,9 @@ def nuit_un_end_loop(ctx, msg):
         await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses "
                                    "🐺")
         await channel_village.send("Le Village se réveille et apprend que durant la nuit 🌙:")
+        channel = discord.utils.get(ctx.guild.text_channels, name='village')
+        role = discord.utils.get(ctx.guild.roles, name='Villageois')
+        await channel.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
         voice_channel = discord.utils.get(ctx.guild.channels, name="Village_vocal")
         if x >= 1:
             await channel_village.send("Il y a une égalité et personne ne meurt :🤔")
@@ -798,6 +804,9 @@ async def nuit_un(ctx):
                                "contraire "
                                "tenterez-vous de le précipiter dans la mort ?")
     await channel_village.send("C’est la nuit, tout le village s’endort, les joueurs ferment leurs micros")
+    channel = discord.utils.get(ctx.guild.text_channels, name='village')
+    role = discord.utils.get(ctx.guild.roles, name='Villageois')
+    await channel.set_permissions(role, read_messages=True, send_messages=False, view_channel=True)
     await mute(channel_vocal, "true")
     await channel_village.send("La voyante se reveille pour decouvrit le role d'un joueur")
     channel_voyante = discord.utils.get(guild.text_channels, name='voyante')
