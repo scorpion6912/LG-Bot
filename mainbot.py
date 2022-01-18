@@ -744,17 +744,17 @@ async def botsetup(ctx, par):
     if role is None:
         await ctx.guild.create_role(name="Mort", colour=0xFF0F00, mentionable=True)
     else:
-        await ctx.send(f"Le rôle a déjà été créer")
+        await ctx.send(f"Le rôle a déjà été crée")
     role = discord.utils.get(ctx.guild.roles, name="Villageois")
     if role is None:
         await ctx.guild.create_role(name="Villageois", colour=0xFF0F00, mentionable=True)
     else:
-        await ctx.send(f"Le rôle a déjà été créer")
+        await ctx.send(f"Le rôle a déjà été crée")
     role = discord.utils.get(ctx.guild.roles, name="Participant")
     if role is None:
         await ctx.guild.create_role(name="Participant", mentionable=True)
     else:
-        await ctx.send(f"Le rôle a déjà été créer")
+        await ctx.send(f"Le rôle a déjà été crée")
     guild = ctx.guild
     if par != "new game":
         channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
@@ -768,7 +768,7 @@ async def botsetup(ctx, par):
             role = discord.utils.get(ctx.guild.roles, name="Mort")
             await channel_vocal.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
         else:
-            await ctx.send(f"Le vocal a déjà été créer")
+            await ctx.send(f"Le vocal a déjà été crée")
     channel = discord.utils.get(guild.text_channels, name='village')
     if channel is None:
         channel = await guild.create_text_channel('village')
@@ -783,13 +783,13 @@ async def botsetup(ctx, par):
         await msg.add_reaction('➕')
         await msg.add_reaction('✅')
     else:
-        await ctx.send(f"village est déjà créer")
+        await ctx.send(f"village est déjà crée")
     channel = discord.utils.get(guild.text_channels, name='loup-garou')
     if channel is None:
         channel = await guild.create_text_channel('loup-garou')
         await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
     else:
-        await ctx.send(f"loup-garou est déjà créer")
+        await ctx.send(f"loup-garou est déjà crée")
     channel = discord.utils.get(guild.text_channels, name='cimetiere')
     if channel is None:
         channel = await guild.create_text_channel('cimetiere')
@@ -797,25 +797,25 @@ async def botsetup(ctx, par):
         role = discord.utils.get(ctx.guild.roles, name="Mort")
         await channel.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
     else:
-        await ctx.send(f"cimetiere est déjà créer")
+        await ctx.send(f"cimetiere est déjà crée")
     channel = discord.utils.get(guild.text_channels, name='cupidon')
     if channel is None:
         channel = await guild.create_text_channel('cupidon')
         await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
     else:
-        await ctx.send(f"cupidon est déjà créer")
+        await ctx.send(f"cupidon est déjà crée")
     channel = discord.utils.get(guild.text_channels, name='sorciere')
     if channel is None:
         channel = await guild.create_text_channel('sorciere')
         await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
     else:
-        await ctx.send(f"sorciere est déjà créer")
+        await ctx.send(f"sorciere est déjà crée")
     channel = discord.utils.get(guild.text_channels, name='voyante')
     if channel is None:
         channel = await guild.create_text_channel('voyante')
         await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
     else:
-        await ctx.send(f"voyante est déjà créer")
+        await ctx.send(f"voyante est déjà crée")
 
 
 async def nuit_un(ctx):
