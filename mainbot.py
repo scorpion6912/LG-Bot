@@ -170,6 +170,7 @@ async def setup(ctx):
 # Fonction de desetup
 @bot.command(name="desetup")
 async def desetup(ctx):
+    await unmute_all(ctx)
     await botdesetup(ctx)
 
 
