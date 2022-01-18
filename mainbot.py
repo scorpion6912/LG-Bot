@@ -155,6 +155,7 @@ async def on_raw_reaction_remove(payload):
     channel4 = discord.utils.get(guild.text_channels, name='cimetiere')
     if payload.channel_id == channel.id or payload.channel_id == channel2.id or payload.channel_id == channel3.id or payload.channel_id == channel4.id:
         role = discord.utils.get(guild.roles, name='Villageois')
+        role2 = discord.utils.get(guild.roles, name='Participant')
         chan = bot.get_channel(payload.channel_id)
         msg = await chan.fetch_message(payload.message_id)
         if msg.content == (
@@ -162,6 +163,7 @@ async def on_raw_reaction_remove(payload):
                 f"lancer "
                 f"la partie"):
             await member.remove_roles(role)
+            await member.remove_roles(role2)
             await channel.send(f"{member.mention} est désinscrit".format(member))
         if "Faites le bon choix" in msg.content:
             # await var_add(guild, member)
