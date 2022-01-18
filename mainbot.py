@@ -47,7 +47,7 @@ async def on_reaction_add(reaction, ctx):
         role2 = discord.utils.get(ctx.guild.roles, name='Participant')
         msg = await channel.fetch_message(reaction.message.id)
         if msg.content == (
-                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer, puis ✅ pour"
+                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer, puis ✅ pour "
                 f"lancer "
                 f"la partie"):
             await ctx.add_roles(role)
@@ -58,7 +58,7 @@ async def on_reaction_add(reaction, ctx):
     if reaction.emoji == "✅":
         msg = await channel.fetch_message(reaction.message.id)
         if msg.content == (
-                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer, puis ✅ pour"
+                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer, puis ✅ pour "
                 f"lancer "
                 f"la partie"):
             msg = await channel.fetch_message(reaction.message.id)
@@ -158,7 +158,7 @@ async def on_raw_reaction_remove(payload):
         chan = bot.get_channel(payload.channel_id)
         msg = await chan.fetch_message(payload.message_id)
         if msg.content == (
-                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer, puis ✅ pour"
+                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer, puis ✅ pour "
                 f"lancer "
                 f"la partie"):
             await member.remove_roles(role)
@@ -771,7 +771,7 @@ async def botsetup(ctx, par):
     if channel is None:
         channel = await guild.create_text_channel('village')
         msg = await channel.send(
-            f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer, puis ✅ pour"
+            f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer, puis ✅ pour "
             f"lancer "
             f"la partie")
         role = discord.utils.get(ctx.guild.roles, name="Participant")
