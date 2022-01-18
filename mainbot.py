@@ -738,6 +738,8 @@ async def botsetup(ctx):
                                             view_channel=False)
         role = discord.utils.get(ctx.guild.roles, name="Villageois")
         await channel_vocal.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
+        role = discord.utils.get(ctx.guild.roles, name="Mort")
+        await channel_vocal.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
     else:
         await ctx.send(f"Le vocal a déjà été créer")
     channel = discord.utils.get(guild.text_channels, name='village')
