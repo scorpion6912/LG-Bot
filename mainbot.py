@@ -56,17 +56,29 @@ async def on_reaction_add(reaction, ctx):
             print("autre channel add")
     if reaction.emoji == "✅":
         msg = await channel.fetch_message(reaction.message.id)
-        await msg.delete()
-        await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
-        role = discord.utils.get(ctx.guild.roles, name='Villageois')
-        await channel.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
-        if await count_villageois(ctx) < 2:
-            await channel.send("impossible de lancer à moins de 4")
-            await botdesetup(ctx)
-            await botsetup(ctx)
-            return
-        await liste_villageois(ctx)
-        await nuit_un(ctx)
+        if msg.content == (
+                f"Les salons ont bien été créés, merci de réagir avec : ➕ à ce messsage pour participer, puis ✅ pour"
+                f"lancer "
+                f"la partie"):
+            msg = await channel.fetch_message(reaction.message.id)
+            await msg.delete()
+            await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
+            role = discord.utils.get(ctx.guild.roles, name='Villageois')
+            await channel.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
+            if await count_villageois(ctx) < 2:
+                await channel.send("impossible de lancer à moins de 4")
+                await botdesetup(ctx, "new_game")
+                await botsetup(ctx, "new game")
+                return
+            await liste_villageois(ctx)
+            await nuit_un(ctx)
+        if msg.content == "Voulez-vous relancer une partie ?":
+            await botdesetup(ctx, "new game")
+            await botsetup(ctx, "new game")
+    if reaction.emoji == "❌":
+        msg = await channel.fetch_message(reaction.message.id)
+        if msg.content == "Voulez-vous relancer une partie ?":
+            await botdesetup(ctx, "None")
     if "Faites le bon choix" in reaction.message.content:
         with open("vars.json", "r") as f:
             vars = json.load(f)
@@ -164,14 +176,14 @@ async def on_raw_reaction_remove(payload):
 # Création d'un salon textuel
 @bot.command(name="setup")
 async def setup(ctx):
-    await botsetup(ctx)
+    await botsetup(ctx, "None")
 
 
 # Fonction de desetup
 @bot.command(name="desetup")
 async def desetup(ctx):
     await unmute_all(ctx)
-    await botdesetup(ctx)
+    await botdesetup(ctx, "None")
 
 
 # Affichage des commandes
@@ -505,6 +517,10 @@ def jour_end_loop(ctx, msg, msg_cim, liste_cim):
         if x == 1:
             await unmute_all(ctx)
             await channel_village.send("La partie est terminée")
+            await classement(channel_village)
+            msg2 = await channel_village.send("Voulez-vous relancer une partie ?")
+            await msg2.add_reaction('✅')
+            await msg2.add_reaction('❌')
             return -1
         else:
             await channel_village.send("C’est la nuit, tout le village s’endort, les joueurs ferment leurs micros 🎙️")
@@ -616,6 +632,10 @@ def nuit_un_end_loop(ctx, msg):
         if x == 1:
             await unmute_all(ctx)
             await channel_village.send("La partie est terminée")
+            await classement(channel_village)
+            msg2 = await channel_village.send("Voulez-vous relancer une partie ?")
+            await msg2.add_reaction('✅')
+            await msg2.add_reaction('❌')
             return -1
         else:
             await channel_village.send("Le village commence a débattre 📩")
@@ -690,7 +710,7 @@ async def liste_id_villageois(ctx):
     return role.members
 
 
-async def botdesetup(ctx):
+async def botdesetup(ctx, par):
     guild = ctx.guild
     role = discord.utils.get(ctx.guild.roles, name="Villageois")
     await role.delete()
@@ -698,8 +718,9 @@ async def botdesetup(ctx):
     await role.delete()
     role = discord.utils.get(ctx.guild.roles, name="Mort")
     await role.delete()
-    channel = discord.utils.get(guild.channels, name='Village_vocal')
-    await channel.delete()
+    if par != "new game":
+        channel = discord.utils.get(guild.channels, name='Village_vocal')
+        await channel.delete()
     channel = discord.utils.get(guild.text_channels, name='village')
     await channel.delete()
     channel = discord.utils.get(guild.text_channels, name='loup-garou')
@@ -714,7 +735,7 @@ async def botdesetup(ctx):
     await channel.delete()
 
 
-async def botsetup(ctx):
+async def botsetup(ctx, par):
     role = discord.utils.get(ctx.guild.roles, name="Mort")
     if role is None:
         await ctx.guild.create_role(name="Mort", colour=0xFF0F00, mentionable=True)
@@ -731,18 +752,19 @@ async def botsetup(ctx):
     else:
         await ctx.send(f"Le rôle a déjà été créer")
     guild = ctx.guild
-    channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
-    if channel_vocal is None:
-        await guild.create_voice_channel('Village_vocal')
+    if par != "new game":
         channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
-        await channel_vocal.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False,
-                                            view_channel=False)
-        role = discord.utils.get(ctx.guild.roles, name="Villageois")
-        await channel_vocal.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
-        role = discord.utils.get(ctx.guild.roles, name="Mort")
-        await channel_vocal.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
-    else:
-        await ctx.send(f"Le vocal a déjà été créer")
+        if channel_vocal is None:
+            await guild.create_voice_channel('Village_vocal')
+            channel_vocal = discord.utils.get(guild.channels, name='Village_vocal')
+            await channel_vocal.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False,
+                                                view_channel=False)
+            role = discord.utils.get(ctx.guild.roles, name="Villageois")
+            await channel_vocal.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
+            role = discord.utils.get(ctx.guild.roles, name="Mort")
+            await channel_vocal.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
+        else:
+            await ctx.send(f"Le vocal a déjà été créer")
     channel = discord.utils.get(guild.text_channels, name='village')
     if channel is None:
         channel = await guild.create_text_channel('village')
