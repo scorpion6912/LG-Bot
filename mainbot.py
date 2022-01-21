@@ -40,8 +40,16 @@ async def on_reaction_add(reaction, ctx):
         return
     role = discord.utils.get(ctx.guild.roles, name="Mort")
     if role in ctx.roles:
-        await reaction.message.remove_reaction(reaction.emoji, ctx)
-        return
+        if reaction.message.channel.id == channel4.id:
+            with open("vars.json", "r") as f:
+                vars = json.load(f)
+            await add_var(ctx, ctx, 1)
+            vote = vars[str(ctx.id)]["vote"]
+            if vote > 0:
+                await reaction.message.remove_reaction(reaction.emoji, ctx)
+                await chan.send("Il n'est pas possible de voter pour deux personnes différentes")
+                await add_var(ctx, ctx, 1)
+            return
     if reaction.emoji == "➕":
         role = discord.utils.get(ctx.guild.roles, name='Villageois')
         role2 = discord.utils.get(ctx.guild.roles, name='Participant')
@@ -411,12 +419,23 @@ async def unmute_all(ctx):
 async def sondage(ctx, x, y, day):
     global msg_cim, liste_cim
     liste = await liste_id_villageois(ctx)
+    liste2 = await liste_id_mort(ctx)
     liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
     nb = await count_villageois(ctx)
     lst = [0] * nb
     i = 0
     guild = ctx.guild
     text = ""
+    j = 0
+    while j != len(liste2):
+        await add_var(ctx, liste2[j], 0)
+        with open("vars.json", "r") as f:
+            vars = json.load(f)
+        vote = vars[str(liste2[j].id)]["vote"]
+        print(vote)
+        if vote > 0:
+            await add_var(guild, liste2[i], -1)
+        j += 1
     while i != len(liste):
         await add_var(ctx, liste[i], 0)
         with open("vars.json", "r") as f:
@@ -706,6 +725,11 @@ async def count_villageois(ctx):
 
 async def liste_id_participant(ctx):
     role = discord.utils.get(ctx.guild.roles, name='Participant')
+    return role.members
+
+
+async def liste_id_mort(ctx):
+    role = discord.utils.get(ctx.guild.roles, name='Mort')
     return role.members
 
 
