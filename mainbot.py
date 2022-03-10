@@ -1108,6 +1108,8 @@ async def check_fin(ctx):
             lg = lg + 1
         if role == 1 or role == 2:
             villageois = villageois + 1
+        if role == 4:
+            villageois = villageois + 2
         i = i + 1
     if lg > villageois:
         x = 0
