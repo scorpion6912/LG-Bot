@@ -307,7 +307,7 @@ async def choix_lg(ctx):
     text2 = "La voyante est : "
     text2 = text2 + "<@" + str(user.id) + ">" + " "
     await channel.send(text2.format(ctx))
-    if len(liste) >= 1:
+    if len(liste) >= 5:
         channel = discord.utils.get(ctx.guild.text_channels, name='chasseur')
         choice = liste.pop()
         user = bot.get_user(choice.id)
