@@ -47,7 +47,7 @@ async def on_reaction_add(reaction, ctx):
             vote = vars[str(ctx.id)]["vote"]
             if vote > 0:
                 await reaction.message.remove_reaction(reaction.emoji, ctx)
-                await chan.send("Il n'est pas possible de voter pour deux personnes différentes")
+                await ctx.send("Il n'est pas possible de voter pour deux personnes différentes")
                 await add_var(ctx, ctx, 1)
             return
     if reaction.emoji == "➕":
@@ -95,7 +95,7 @@ async def on_reaction_add(reaction, ctx):
         vote = vars[str(ctx.id)]["vote"]
         if vote > 0:
             await reaction.message.remove_reaction(reaction.emoji, ctx)
-            await chan.send("Il n'est pas possible de voter pour deux personnes différentes")
+            await ctx.send("Il n'est pas possible de voter pour deux personnes différentes")
             await add_var(ctx, ctx, 1)
 
 
