@@ -444,7 +444,7 @@ async def sondage(ctx, x, y, day):
     global msg_cim, liste_cim
     liste = await liste_id_villageois(ctx)
     liste2 = await liste_id_mort(ctx)
-    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟', '❤', '🧡', '💛', '💚', '💙', '💜', '🤎', '🤍']
     nb = await count_villageois(ctx)
     lst = [0] * nb
     i = 0
@@ -782,7 +782,7 @@ async def verif_cimetiere(ctx, mort, msg, liste_cim):
     i = 0
     while liste_cim[i] != mort:
         i = i + 1
-    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟', '❤', '🧡', '💛', '💚', '💙', '💜', '🤎', '🤍']
     emojii = liste_emoji[i]
     m = await cimetiere.fetch_message(msg.id)
     react = discord.utils.get(m.reactions, emoji=emojii)
@@ -841,7 +841,7 @@ def nuit_un_end_loop(ctx, msg):
 
 async def nom_react(ctx, msg):
     liste = await liste_id_villageois(ctx)
-    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟', '❤', '🧡', '💛', '💚', '💙', '💜', '🤎', '🤍']
     v = 0
     text = ""
     channel = discord.utils.get(ctx.guild.text_channels, name='village')
@@ -863,7 +863,7 @@ async def nom_react(ctx, msg):
 
 async def count_react(ctx, msg):
     liste = await liste_id_villageois(ctx)
-    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+    liste_emoji = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟', '❤', '🧡', '💛', '💚', '💙', '💜', '🤎', '🤍']
     nb = await count_villageois(ctx)
     lst = [0] * nb
     v = 0
