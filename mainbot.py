@@ -251,6 +251,13 @@ async def delete(ctx, number: int):
         await each_message.delete()
 
 
+async def sup(channel):
+    messages = await channel.history().flatten()
+    for message in messages:
+        if "Il vous reste" in message.content:
+            await message.delete()
+
+
 # Ping (pong)
 @bot.command(name='ping')
 async def ping(ctx):
@@ -426,6 +433,7 @@ async def check_role(ctx, user: discord.User):
         await channel.send(member.name + " est loup garou 🐺")
     if role == 4:
         await channel.send(member.name + " est chasseur 🔫")
+    await sup(channel)
 
 
 async def mute(ctx, setting):
@@ -461,7 +469,6 @@ async def sondage(ctx, x, y, day):
         with open("vars.json", "r") as f:
             vars = json.load(f)
         vote = vars[str(liste2[j].id)]["vote"]
-        print(vote)
         if vote > 0:
             await add_var(guild, liste2[i], -1)
         j += 1
@@ -527,6 +534,8 @@ def chasseur_end_loop(ctx, msg, tmp):
         guild = ctx.guild
         liste = await liste_id_villageois(ctx)
         await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique ! ✨")
+        channel_chasseur = discord.utils.get(guild.text_channels, name='chasseur')
+        await sup(channel_chasseur)
         channel_village = discord.utils.get(guild.text_channels, name='village')
         x, pos = await count_react(ctx, msg)
         await channel_village.send("Le Chasseur à décider...")
@@ -662,6 +671,9 @@ def jour_end_loop(ctx, msg, msg_cim, liste_cim):
         liste = await liste_id_villageois(ctx)
         await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique ! ✨")
         channel_village = discord.utils.get(guild.text_channels, name='village')
+        channel_cim = discord.utils.get(guild.text_channels, name='cimetiere')
+        await sup(channel_village)
+        await sup(channel_cim)
         await nom_react(ctx, msg)
         x, pos = await count_react(ctx, msg)
         await channel_village.send("Le Village a fait son choix 🪓")
@@ -807,6 +819,8 @@ def nuit_un_end_loop(ctx, msg):
         guild = ctx.guild
         liste = await liste_id_villageois(ctx)
         await ctx.send("Le temps est écoulé ! J'espère que votre choix vous sera bénéfique ! ✨")
+        channel_lg = discord.utils.get(guild.text_channels, name='loup-garou')
+        await sup(channel_lg)
         channel_village = discord.utils.get(guild.text_channels, name='village')
         x, pos = await count_react(ctx, msg)
         await channel_village.send("Les Loups-Garous repus se rendorment et rêvent de prochaines victimes savoureuses "
