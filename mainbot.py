@@ -234,7 +234,12 @@ async def roles(message):
                               "démasquer.\n"
                               "• Utilise ton pouvoir chaque nuit en cliquant sur le joueur de ton choix pour "
                               "connaître son rôle.\n"
-                              "• Copier le texte indiquant le rôle du joueur observé est considéré comme anti-jeu.\n\n")
+                              "• Copier le texte indiquant le rôle du joueur observé est considéré comme anti-jeu.\n\n"
+                              "Chasseur:\n"
+                              "Son objectif est de vaincre les Loups-Garous. Lorsque le Chasseur meurt, il a le "
+                              "pouvoir d'amener un autre joueur avec lui dans sa tombe.\n "
+                              "• Le Chasseur a la possibilité de ne tuer personne à sa mort s'il trouve cette option "
+                              "stratégique.\n\n")
 
 
 # Commande pour effacer des messages dans un channel
