@@ -255,7 +255,7 @@ async def delete(ctx, number: int):
 
 @bot.command(name="play")
 async def play(ctx):
-    audio = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio("gymno.mp3"), volume=0.5)
+    audio = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio("music_ambiance.mp3"), volume=0.05)
     ctx.guild.voice_client.play(audio, after=lambda e: print('Erreur' % e) if e else bot.loop.create_task(play(ctx)))
 
 
