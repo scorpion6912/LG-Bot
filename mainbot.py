@@ -81,6 +81,9 @@ async def on_reaction_add(reaction, ctx):
                 await botsetup(ctx, "new game")
                 return
             await liste_villageois(ctx)
+            channel_vocal = discord.utils.get(ctx.guild.channels, name='Village_vocal')
+            await joinn(channel_vocal)
+            await play(channel_vocal)
             await nuit_un(ctx)
         if msg.content == "Voulez-vous relancer une partie ?":
             await botdesetup(ctx, "new game")
@@ -253,13 +256,11 @@ async def delete(ctx, number: int):
         await each_message.delete()
 
 
-@bot.command(name="play")
 async def play(ctx):
     audio = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio("music_ambiance.mp3"), volume=0.05)
     ctx.guild.voice_client.play(audio, after=lambda e: print('Erreur' % e) if e else bot.loop.create_task(play(ctx)))
 
 
-@bot.command(name="stop")
 async def stop(ctx):
     ctx.guild.voice_client.pause()
 
@@ -282,6 +283,10 @@ async def ping(ctx):
 async def join(ctx):
     channel = ctx.author.voice.channel
     await channel.connect()
+
+
+async def joinn(ctx):
+    await ctx.connect()
 
 
 # Déconnexion dans salon vocal
@@ -453,11 +458,12 @@ async def mute(ctx, setting):
     voice_channel = discord.utils.get(ctx.guild.channels, name="Village_vocal")
     role = discord.utils.get(ctx.guild.roles, name='Mort')
     for member in voice_channel.members:
-        if setting.lower() == 'true':
-            await member.edit(mute=True)
-        elif setting.lower() == 'false':
-            if role not in member.roles:
-                await member.edit(mute=False)
+        if member.id != 834401250865840148:
+            if setting.lower() == 'true':
+                await member.edit(mute=True)
+            elif setting.lower() == 'false':
+                if role not in member.roles:
+                    await member.edit(mute=False)
 
 
 async def unmute_all(ctx):
@@ -1157,6 +1163,7 @@ async def check_fin(ctx):
                     await add_xp2(ctx, liste[x], 2)
             x = x + 1
         await channel_village.send("Les loup garous ont gagné")
+        await stop(ctx)
         return 1
     if lg == 0:
         x = 0
@@ -1172,6 +1179,7 @@ async def check_fin(ctx):
                     await add_xp2(ctx, liste[x], 6)
             x = x + 1
         await channel_village.send("Les villageois ont gagné")
+        await stop(ctx)
         return 1
     if villageois >= lg:
         return 0
