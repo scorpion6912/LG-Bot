@@ -343,7 +343,7 @@ async def choix_lg(ctx):
         user = bot.get_user(choice.id)
         await add_role(ctx, user, 3)
         await add_role2(ctx, user, 3)
-        await assigner_voyante(ctx, user)
+        await assigner_chasseur(ctx, user)
         text2 = "Le Chasseur est : "
         text2 = text2 + "<@" + str(user.id) + ">" + " "
         await channel.send(text2.format(ctx))
@@ -360,6 +360,11 @@ async def choix_lg(ctx):
 
 async def assigner_lg(ctx, user):
     channel = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
+    await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
+
+
+async def assigner_chasseur(ctx, user):
+    channel = discord.utils.get(ctx.guild.text_channels, name='chasseur')
     await channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
 
 
