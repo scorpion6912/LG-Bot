@@ -259,6 +259,11 @@ async def play(ctx):
     ctx.guild.voice_client.play(audio, after=lambda e: print('Erreur' % e) if e else bot.loop.create_task(play(ctx)))
 
 
+@bot.command(name="stop")
+async def stop(ctx):
+    ctx.guild.voice_client.pause()
+
+
 async def sup(channel):
     messages = await channel.history().flatten()
     for message in messages:
