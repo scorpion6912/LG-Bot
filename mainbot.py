@@ -253,6 +253,12 @@ async def delete(ctx, number: int):
         await each_message.delete()
 
 
+@bot.command(name="play")
+async def play(ctx):
+    audio = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio("gymno.mp3"), volume=0.5)
+    ctx.guild.voice_client.play(audio)
+
+
 async def sup(channel):
     messages = await channel.history().flatten()
     for message in messages:
