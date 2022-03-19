@@ -34,7 +34,8 @@ async def on_reaction_add(reaction, ctx):
     channel2 = discord.utils.get(ctx.guild.text_channels, name='loup-garou')
     channel3 = discord.utils.get(ctx.guild.text_channels, name='voyante')
     channel4 = discord.utils.get(ctx.guild.text_channels, name='cimetiere')
-    if reaction.message.channel.id == channel.id or reaction.message.channel.id == channel2.id or reaction.message.channel.id == channel3.id or reaction.message.channel.id == channel4.id:
+    channel5 = discord.utils.get(ctx.guild.text_channels, name="chasseur")
+    if reaction.message.channel.id == channel.id or reaction.message.channel.id == channel2.id or reaction.message.channel.id == channel3.id or reaction.message.channel.id == channel4.id or reaction.message.channel.id == channel5.id:
         chan = bot.get_channel(reaction.message.channel.id)
     else:
         return
@@ -74,7 +75,7 @@ async def on_reaction_add(reaction, ctx):
             await channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
             role = discord.utils.get(ctx.guild.roles, name='Villageois')
             await channel.set_permissions(role, read_messages=True, send_messages=True, view_channel=True)
-            if await count_villageois(ctx) < 2:
+            if await count_villageois(ctx) < 4:
                 await channel.send("impossible de lancer à moins de 4")
                 await botdesetup(ctx, "new_game")
                 await botsetup(ctx, "new game")
@@ -161,7 +162,8 @@ async def on_raw_reaction_remove(payload):
     channel2 = discord.utils.get(guild.text_channels, name='loup-garou')
     channel3 = discord.utils.get(guild.text_channels, name='voyante')
     channel4 = discord.utils.get(guild.text_channels, name='cimetiere')
-    if payload.channel_id == channel.id or payload.channel_id == channel2.id or payload.channel_id == channel3.id or payload.channel_id == channel4.id:
+    channel5 =  discord.utils.get(guild.text_channels, name='chasseur')
+    if payload.channel_id == channel.id or payload.channel_id == channel2.id or payload.channel_id == channel3.id or payload.channel_id == channel4.id or payload.channel_id == channel5.id:
         role = discord.utils.get(guild.roles, name='Villageois')
         role2 = discord.utils.get(guild.roles, name='Participant')
         chan = bot.get_channel(payload.channel_id)
