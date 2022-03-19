@@ -278,8 +278,6 @@ async def ping(ctx):
     await ctx.send(f'Pong! {round(bot.latency * 1000)}ms')
 
 
-# Connexion dans salon vocal
-@bot.command()
 async def join(ctx):
     channel = ctx.author.voice.channel
     await channel.connect()
