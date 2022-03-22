@@ -51,6 +51,10 @@ async def on_reaction_add(reaction, ctx):
                 await ctx.send("Il n'est pas possible de voter pour deux personnes différentes")
                 await add_var(ctx, ctx, 1)
             return
+        else:
+            await reaction.message.remove_reaction(reaction.emoji, ctx)
+            await ctx.send("Il n'est pas possible de voter pour deux personnes différentes")
+            await add_var(ctx, ctx, 1)
     if reaction.emoji == "➕":
         role = discord.utils.get(ctx.guild.roles, name='Villageois')
         role2 = discord.utils.get(ctx.guild.roles, name='Participant')
@@ -284,11 +288,10 @@ async def join(ctx):
 
 
 async def joinn(ctx):
-    await ctx.connect()
+        await ctx.connect()
 
 
 # Déconnexion dans salon vocal
-@bot.command()
 async def leave(ctx):
     await ctx.voice_client.disconnect()
 
@@ -700,6 +703,7 @@ def jour_end_loop(ctx, msg, msg_cim, liste_cim):
         x, pos = await count_react(ctx, msg)
         await channel_village.send("Le Village a fait son choix 🪓")
         if x >= 1:
+            msg_cim.delete()
             await channel_village.send("Il y a une égalité et personne ne meurt 🤔")
             cimetiere = discord.utils.get(guild.text_channels, name='cimetiere')
             role = discord.utils.get(ctx.guild.roles, name='Mort')
@@ -734,11 +738,11 @@ def jour_end_loop(ctx, msg, msg_cim, liste_cim):
                 await sondage(cimetiere, 10, 3, "cimetiere")
         else:
             role = await kill(ctx, liste[pos], "fin_jour")
+            await verif_cimetiere(ctx, liste[pos], msg_cim, liste_cim)
             if role != "Chasseur":
                 cimetiere = discord.utils.get(guild.text_channels, name='cimetiere')
                 role2 = discord.utils.get(ctx.guild.roles, name='Mort')
                 await cimetiere.set_permissions(role2, read_messages=True, send_messages=True, view_channel=True)
-                await verif_cimetiere(ctx, liste[pos], msg_cim, liste_cim)
                 await channel_village.send(f"{liste[pos].mention} est mort, il était {role}".format(ctx))
                 x = await check_fin(ctx)
                 if x == 1:
